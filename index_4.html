@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>El Moasser Writing Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap">
+<script>(function(){var l='en';try{var s=localStorage.getItem('moasser-deck-lang');if(s==='ar'||s==='en')l=s;}catch(e){}document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';})();</script>
+<style>
+:root{
+  /* Layout: one 16:9 stage measured in slide units (--u = 1% of stage width) over a live particle field; narrow, portrait or short screens get a scrolling column of the same slides. */
+  --ink:#0B0B0C;
+  --ink-2:#131315;
+  --paper:#FAFAF8;
+  --paper-2:#CFCEC8;
+  --paper-3:#9F9E98;
+  --mute:#85847E;
+  --stone:#4A4946;
+  --line:rgba(250,250,248,.14);
+  --wash:rgba(250,250,248,.06);
+  --accent:#FF4200;
+  --accent-2:#FF7A45;
+  --accent-3:#FFAA85;
+  --accent-soft:rgba(255,66,0,.14);
+  --f-display:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --f-body:"Inter","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --f-ar:"IBM Plex Sans Arabic","Noto Sans Arabic","Geeza Pro","Segoe UI",Tahoma,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --u:min(1vw,1.7778vh);
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);overflow:hidden;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+html[lang="ar"] body{font-family:var(--f-ar)}
+html[lang="ar"] .en,html:not([lang="ar"]) .ar{display:none!important}
+html[lang="ar"] *{letter-spacing:0!important}
+h1,h2,h3,p,ol,ul{margin:0}
+a{color:inherit}
+bdi{unicode-bidi:isolate}
+bdi[dir="ltr"]{white-space:nowrap}
+
+/* background */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg canvas{display:block;width:100%;height:100%}
+.shade{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 95% at 50% 45%,rgba(11,11,12,0) 30%,rgba(11,11,12,.78) 100%)}
+
+/* chrome */
+.chrome{position:fixed;inset:0 0 auto 0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:calc(env(safe-area-inset-top,0px) + 14px);padding-bottom:10px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));font:500 12px/1 var(--f-mono);letter-spacing:.08em;color:var(--paper-2)}
+.brand{display:flex;align-items:center;gap:10px;text-transform:uppercase;white-space:nowrap;min-width:0}
+.brand b{font-family:var(--f-display);font-stretch:118%;font-weight:800;letter-spacing:.08em;color:var(--paper)}
+.brand .x{color:var(--accent)}
+html[lang="ar"] .brand{font-family:var(--f-ar);text-transform:none;font-size:13px}
+html[lang="ar"] .brand b,html[lang="ar"] .title-foot .by{font-family:var(--f-ar);font-stretch:normal}
+.tools{display:flex;align-items:center;gap:8px}
+.btn{appearance:none;border:1px solid var(--line);background:rgba(19,19,21,.72);color:var(--paper);font:500 12px/1 var(--f-mono);letter-spacing:.06em;padding:9px 13px;border-radius:999px;cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:border-color .2s,background .2s}
+.btn:hover{border-color:var(--paper-3);background:rgba(30,30,33,.8)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn .arl{font-family:var(--f-ar);font-size:13px;letter-spacing:0;font-weight:600}
+.counter{font-variant-numeric:tabular-nums;min-width:62px;text-align:center;color:var(--paper-2)}
+.nav{position:fixed;z-index:6;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);right:max(20px,env(safe-area-inset-right,0px));display:flex;gap:8px}
+html[dir="rtl"] .nav{right:auto;left:max(20px,env(safe-area-inset-left,0px))}
+.nav .btn{width:44px;height:44px;padding:0;display:grid;place-items:center;font-size:17px}
+html[dir="rtl"] .nav .ico{display:inline-block;transform:scaleX(-1)}
+.progress{position:fixed;left:0;right:0;bottom:0;height:3px;z-index:6;background:rgba(250,250,248,.08)}
+.progress i{display:block;height:100%;background:var(--accent);transform-origin:left center;transform:scaleX(0);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+html[dir="rtl"] .progress i{transform-origin:right center}
+
+/* stage */
+.deck{position:fixed;inset:0;z-index:1}
+.slide{position:absolute;left:50%;top:50%;width:calc(var(--u)*100);height:calc(var(--u)*56.25);transform:translate(-50%,-50%);box-sizing:border-box;padding:calc(var(--u)*7) calc(var(--u)*6) calc(var(--u)*5);display:flex;flex-direction:column;gap:calc(var(--u)*2.1);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s linear .45s}
+.slide.is-active{opacity:1;visibility:visible;transition:opacity .6s ease .05s,visibility 0s}
+@media (prefers-reduced-motion:no-preference){
+  .slide.is-active .a{animation:rise .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*85ms + 140ms)}
+}
+@keyframes rise{from{opacity:0;transform:translateY(calc(var(--u)*1.4))}to{opacity:1;transform:none}}
+
+/* type */
+.eyebrow{display:flex;align-items:center;gap:calc(var(--u)*1);font:500 calc(var(--u)*1.05)/1.2 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.eyebrow::before{content:"";flex:none;width:calc(var(--u)*2.6);height:1px;background:var(--accent)}
+html[lang="ar"] .eyebrow{font:600 calc(var(--u)*1.3)/1.3 var(--f-ar);text-transform:none}
+.h1{font-family:var(--f-display);font-stretch:116%;font-weight:800;font-size:calc(var(--u)*6.3);line-height:.95;letter-spacing:-.02em;text-wrap:balance;max-width:calc(var(--u)*56)}
+.h2{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:calc(var(--u)*3.2);line-height:1.07;letter-spacing:-.012em;text-wrap:balance;max-width:calc(var(--u)*82)}
+.statement{font-family:var(--f-display);font-stretch:112%;font-weight:700;font-size:calc(var(--u)*4.5);line-height:1.04;letter-spacing:-.018em;text-wrap:balance;max-width:calc(var(--u)*84)}
+.statement em{font-style:normal;color:var(--accent)}
+.lede{font-size:calc(var(--u)*1.55);line-height:1.45;color:var(--paper-2);max-width:calc(var(--u)*62);text-wrap:pretty}
+.body{font-size:calc(var(--u)*1.25);line-height:1.5;color:var(--paper-2)}
+.small{font-size:calc(var(--u)*1.1);line-height:1.45;color:var(--paper-2)}
+.src{font:400 calc(var(--u)*.9)/1.4 var(--f-mono);color:var(--mute);letter-spacing:.02em}
+html[lang="ar"] .h1,html[lang="ar"] .h2,html[lang="ar"] .statement{font-family:var(--f-ar);font-stretch:normal;font-weight:700;line-height:1.32}
+html[lang="ar"] .h1{font-size:calc(var(--u)*5.4);line-height:1.22}
+html[lang="ar"] .h2{font-size:calc(var(--u)*2.9)}
+html[lang="ar"] .statement{font-size:calc(var(--u)*3.9)}
+html[lang="ar"] .lede,html[lang="ar"] .body,html[lang="ar"] .small{line-height:1.8}
+html[lang="ar"] .src{font-family:var(--f-ar);font-size:calc(var(--u)*1)}
+.mt-auto{margin-top:auto}
+.hot{color:var(--accent)}
+
+/* title */
+.s-title{justify-content:flex-start}
+.s-title .h1{margin-top:calc(var(--u)*3)}
+.title-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:calc(var(--u)*3);font:500 calc(var(--u)*1.05)/1.3 var(--f-mono);color:var(--paper-3);letter-spacing:.06em}
+.title-foot .by{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:calc(var(--u)*1.5);letter-spacing:.1em;text-transform:uppercase;color:var(--paper)}
+html[lang="ar"] .title-foot{font-family:var(--f-ar);font-size:calc(var(--u)*1.15)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u)*2.6)}
+.stats.three{grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*3.4)}
+.stat{display:flex;flex-direction:column;gap:calc(var(--u)*.9);padding-top:calc(var(--u)*1.5);border-top:1px solid var(--line);min-width:0}
+.stat .v{font-family:var(--f-display);font-weight:800;font-stretch:100%;font-size:calc(var(--u)*3.6);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--paper);white-space:nowrap}
+.stat .v.cmp{font-size:calc(var(--u)*2.9);white-space:normal;line-height:1.1}
+.stats.three .stat .v{font-size:calc(var(--u)*5.6)}
+.stat .v small{font-size:.46em;font-weight:600;color:var(--paper-3);letter-spacing:0}
+html[lang="ar"] .stat .v small{font-family:var(--f-ar)}
+html[lang="ar"] .stat .v .word{font-family:var(--f-ar);font-weight:700}
+.stat.hot .v{color:var(--accent)}
+.stat .t{font-size:calc(var(--u)*1.2);line-height:1.45;color:var(--paper-2);text-wrap:pretty}
+html[lang="ar"] .stat .t{line-height:1.75}
+.stat .src{margin-top:auto;padding-top:calc(var(--u)*.4)}
+.verdict{display:flex;align-items:center;gap:calc(var(--u)*1.4);font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:calc(var(--u)*2);line-height:1.2;color:var(--paper)}
+.verdict::before{content:"";flex:none;width:calc(var(--u)*1.1);height:calc(var(--u)*1.1);background:var(--accent)}
+html[lang="ar"] .verdict{font-family:var(--f-ar);font-size:calc(var(--u)*1.9)}
+
+/* process */
+.hours{display:flex;gap:3px;height:calc(var(--u)*4.4)}
+.seg{display:flex;align-items:center;justify-content:center;min-width:0;font:600 calc(var(--u)*1.05)/1 var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.c-plan{background:var(--mute)}
+.c-w1{background:var(--accent)}
+.c-w2{background:var(--accent-2)}
+.c-w3{background:var(--accent-3)}
+.c-r1{background:var(--paper-2)}
+.c-r2{background:var(--paper-3)}
+.c-d{background:var(--stone);color:var(--paper)}
+.hours-cap{display:flex;align-items:center;gap:calc(var(--u)*1);font-size:calc(var(--u)*1.2);color:var(--paper-2)}
+.hours-cap b{color:var(--accent);font-weight:600}
+.steps{list-style:none;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:calc(var(--u)*1.5) calc(var(--u)*2.2);counter-reset:s}
+.steps li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:calc(var(--u)*.8);align-items:baseline;padding-top:calc(var(--u)*1);border-top:1px solid var(--line);font-size:calc(var(--u)*1.15);line-height:1.35;color:var(--paper)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font:500 calc(var(--u)*.95)/1 var(--f-mono);color:var(--mute)}
+.chip{display:inline-block;width:.62em;height:.62em;border-radius:2px;margin-inline-end:.45em;vertical-align:.02em}
+html[lang="ar"] .steps li{line-height:1.6}
+
+/* bars */
+.bars{display:grid;gap:calc(var(--u)*2.4);max-width:calc(var(--u)*78)}
+.bar{display:grid;grid-template-columns:calc(var(--u)*13) minmax(0,1fr);column-gap:calc(var(--u)*2.4);row-gap:calc(var(--u)*.6);align-items:center}
+.bar .v{grid-row:span 2;font-family:var(--f-display);font-weight:800;font-size:calc(var(--u)*4.2);line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar .v small{font-size:.42em;font-weight:600;color:var(--paper-3);letter-spacing:0}
+html[lang="ar"] .bar .v small{font-family:var(--f-ar)}
+.track{position:relative;height:calc(var(--u)*1.25);background:var(--wash)}
+.track i{position:absolute;top:0;bottom:0;inset-inline-start:0;width:var(--w);background:var(--paper-2)}
+.bar.hot .track i{background:var(--accent)}
+.bar .meta{display:flex;justify-content:space-between;gap:calc(var(--u)*2);font-size:calc(var(--u)*1.15);color:var(--paper-2)}
+.bar .meta .src{white-space:nowrap}
+
+/* ranges */
+.split{display:grid;grid-template-columns:minmax(0,1fr) calc(var(--u)*25);gap:calc(var(--u)*4.5);align-items:start}
+.ranges{display:grid;gap:calc(var(--u)*1.05)}
+.rg{display:grid;grid-template-columns:calc(var(--u)*17) minmax(0,1fr) calc(var(--u)*6.5);gap:calc(var(--u)*1.6);align-items:center;font-size:calc(var(--u)*1.2);color:var(--paper)}
+.rg .nm small{display:block;font:400 calc(var(--u)*.9)/1.3 var(--f-mono);color:var(--mute)}
+html[lang="ar"] .rg .nm small{font-family:var(--f-ar)}
+.rg .track{height:calc(var(--u)*1.6);background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 10%),var(--wash)}
+.rg .track i{inset-inline-start:var(--lo);width:calc(var(--hi) - var(--lo));background:var(--accent)}
+.rg .val{font:600 calc(var(--u)*1.1)/1 var(--f-mono);text-align:end;font-variant-numeric:tabular-nums;color:var(--paper)}
+.scale{display:grid;grid-template-columns:calc(var(--u)*17) minmax(0,1fr) calc(var(--u)*6.5);gap:calc(var(--u)*1.6);font:400 calc(var(--u)*.85)/1 var(--f-mono);color:var(--mute)}
+.scale span:nth-child(2){display:flex;justify-content:space-between}
+.totals{display:grid;gap:calc(var(--u)*2)}
+.tot{padding-top:calc(var(--u)*1.2);border-top:1px solid var(--line);display:grid;gap:calc(var(--u)*.4)}
+.tot .v{font-family:var(--f-display);font-weight:800;font-size:calc(var(--u)*3.4);line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot.hot .v{color:var(--accent)}
+.tot .l{font-size:calc(var(--u)*1.15);color:var(--paper-2)}
+
+/* figures */
+.figure{min-width:0}
+.figure svg{display:block;width:100%;height:auto;direction:ltr}
+.chart text{font-family:var(--f-body);fill:var(--paper-2);font-size:15px}
+html[lang="ar"] .chart text{font-family:var(--f-ar)}
+.chart .c-n{fill:var(--paper);font-size:15.5px}
+.chart .c-n.is-hot{font-weight:600;fill:var(--accent)}
+.chart .c-s,.chart .c-v{font-family:var(--f-mono)!important}
+.chart .c-s{fill:var(--mute);font-size:13px}
+.chart .c-v{fill:var(--paper);font-size:15px;font-weight:500}
+.chart .c-band{fill:rgba(250,250,248,.09)}
+.chart .c-axis{stroke:var(--line);stroke-width:1.25}
+.chart .s-mute{stroke:var(--paper-3);stroke-width:2.5}
+.chart .f-mute{fill:var(--paper-3)}
+.chart .s-hot{stroke:var(--accent);stroke-width:2.5}
+.chart .f-hot{fill:var(--accent)}
+.chart .c-rec{fill:var(--accent);font-family:var(--f-mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase}
+html[lang="ar"] .chart .c-rec{font-family:var(--f-ar);font-size:14px;font-weight:600}
+.chart .c-cap{fill:var(--mute);font-size:13px}
+.side{display:grid;gap:calc(var(--u)*1.8);align-content:start}
+.eng text{font-family:var(--f-body)}
+html[lang="ar"] .eng text{font-family:var(--f-ar)}
+.eng .e-nm{fill:var(--paper);font-size:15px;font-weight:600}
+.eng .e-bd{fill:var(--paper-2);font-size:12.5px}
+.eng .e-lab{fill:var(--mute);font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+html[lang="ar"] .eng .e-lab{font-family:var(--f-ar);font-size:13.5px;font-weight:600}
+.eng .e-q{fill:var(--paper-2);font-size:13px}
+.eng .e-lane{fill:rgba(250,250,248,.025);stroke:var(--line)}
+.eng .e-ai{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+.eng .e-p{fill:rgba(11,11,12,.75);stroke:var(--paper-3);stroke-width:1.25}
+.eng .e-bank{fill:rgba(255,66,0,.05);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:6 5}
+.eng .e-ar{fill:none;stroke:var(--paper-3);stroke-width:1.5}
+.eng .e-fb{fill:none;stroke:var(--accent);stroke-width:1.5;stroke-dasharray:5 5}
+
+/* lists */
+.rank{list-style:none;padding:0;display:grid}
+.rank li{display:grid;grid-template-columns:calc(var(--u)*19) minmax(0,1fr) auto;gap:calc(var(--u)*2.4);align-items:baseline;padding:calc(var(--u)*1.25) 0;border-top:1px solid var(--line)}
+.rank .nm{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:calc(var(--u)*1.9);color:var(--paper)}
+html[lang="ar"] .rank .nm{font-family:var(--f-ar);font-size:calc(var(--u)*1.8)}
+.rank p{font-size:calc(var(--u)*1.25);line-height:1.45;color:var(--paper-2)}
+.badge{font:500 calc(var(--u)*.9)/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;padding:calc(var(--u)*.55) calc(var(--u)*1);border:1px solid var(--line);border-radius:999px;color:var(--paper-3);white-space:nowrap}
+html[lang="ar"] .badge{font-family:var(--f-ar);font-size:calc(var(--u)*1.05)}
+.badge.go{border-color:var(--accent);color:var(--accent)}
+.quad{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*2.6) calc(var(--u)*4.5)}
+.q{display:grid;gap:calc(var(--u)*.8);padding-top:calc(var(--u)*1.3);border-top:1px solid var(--line);align-content:start;min-width:0}
+.q h3{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:calc(var(--u)*1.9);line-height:1.15;color:var(--paper)}
+html[lang="ar"] .q h3{font-family:var(--f-ar);font-size:calc(var(--u)*1.8);line-height:1.4}
+.q p{font-size:calc(var(--u)*1.22);line-height:1.5;color:var(--paper-2)}
+html[lang="ar"] .q p{line-height:1.8}
+.risks{display:grid}
+.risks .row{display:grid;grid-template-columns:calc(var(--u)*26) minmax(0,1fr);gap:calc(var(--u)*3);padding:calc(var(--u)*1.05) 0;border-top:1px solid var(--line);align-items:baseline}
+.risks .row.head{border-top:0;padding-bottom:calc(var(--u)*.3);font:500 calc(var(--u)*.9)/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+html[lang="ar"] .risks .row.head{font-family:var(--f-ar);font-size:calc(var(--u)*1.05)}
+.risks .rk{font-weight:600;font-size:calc(var(--u)*1.3);color:var(--paper)}
+.risks .ct{font-size:calc(var(--u)*1.2);line-height:1.45;color:var(--paper-2)}
+html[lang="ar"] .risks .ct{line-height:1.7}
+
+/* money */
+.tblwrap{overflow-x:auto;min-width:0}
+.tbl{width:100%;border-collapse:collapse;font-size:calc(var(--u)*1.3);font-variant-numeric:tabular-nums}
+.tbl th{font:500 calc(var(--u)*.9)/1.35 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-align:start;vertical-align:bottom;padding:0 0 calc(var(--u)*1)}
+html[lang="ar"] .tbl th{font-family:var(--f-ar);font-size:calc(var(--u)*1.05)}
+.tbl td{padding:calc(var(--u)*1.25) 0;border-top:1px solid var(--line);color:var(--paper);white-space:nowrap}
+.tbl th+th,.tbl td+td{padding-inline-start:calc(var(--u)*2.2)}
+.tbl td.hot{color:var(--accent);font-weight:600}
+.notes{display:grid;gap:calc(var(--u)*1.6);align-content:start}
+.note{display:grid;gap:calc(var(--u)*.5);padding-top:calc(var(--u)*1.1);border-top:1px solid var(--line)}
+.note h3{font:500 calc(var(--u)*.9)/1.2 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+html[lang="ar"] .note h3{font-family:var(--f-ar);font-size:calc(var(--u)*1.1);font-weight:600}
+.note p{font-size:calc(var(--u)*1.18);line-height:1.5;color:var(--paper-2)}
+html[lang="ar"] .note p{line-height:1.75}
+
+/* pilot */
+.weeks{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:3px}
+.wk{font:400 calc(var(--u)*.85)/1 var(--f-mono);color:var(--mute);text-align:center;padding-bottom:calc(var(--u)*.6);font-variant-numeric:tabular-nums}
+.ph{grid-row:2;display:grid;gap:calc(var(--u)*.35);align-content:start;padding:calc(var(--u)*1) calc(var(--u)*1.1);background:var(--wash);border-top:2px solid var(--paper-3);min-width:0}
+.ph.hot{background:var(--accent-soft);border-top-color:var(--accent)}
+.ph b{font-family:var(--f-display);font-stretch:108%;font-weight:700;font-size:calc(var(--u)*1.4);color:var(--paper)}
+html[lang="ar"] .ph b{font-family:var(--f-ar);font-size:calc(var(--u)*1.35)}
+.ph span{font-size:calc(var(--u)*1.02);line-height:1.35;color:var(--paper-2)}
+.ph .wl{font:500 calc(var(--u)*.85)/1 var(--f-mono);color:var(--paper-3);letter-spacing:.06em}
+html[lang="ar"] .ph .wl{font-family:var(--f-ar);font-size:calc(var(--u)*.95)}
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*3.4)}
+.cols3 h3{font:500 calc(var(--u)*.92)/1.2 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding-bottom:calc(var(--u)*.9);margin-bottom:calc(var(--u)*.9);border-bottom:1px solid var(--line)}
+html[lang="ar"] .cols3 h3{font-family:var(--f-ar);font-size:calc(var(--u)*1.12);font-weight:600}
+.cols3 ul{list-style:none;padding:0;display:grid;gap:calc(var(--u)*.75)}
+.cols3 li{position:relative;padding-inline-start:calc(var(--u)*1.5);font-size:calc(var(--u)*1.15);line-height:1.4;color:var(--paper)}
+html[lang="ar"] .cols3 li{line-height:1.65}
+.cols3 li::before{content:"";position:absolute;inset-inline-start:0;top:.68em;width:calc(var(--u)*.7);height:1px;background:var(--accent)}
+
+/* close + sources */
+.s-close .h1{max-width:calc(var(--u)*70)}
+.srcs{columns:3;column-gap:calc(var(--u)*3.4);list-style:none;padding:0}
+.srcs li{break-inside:avoid;padding:calc(var(--u)*.55) 0;border-top:1px solid var(--line);font-size:calc(var(--u)*1.02);line-height:1.35;color:var(--paper-2)}
+.srcs li.grp{border-top:0;padding-top:calc(var(--u)*.2);font:500 calc(var(--u)*.88)/1.2 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+html[lang="ar"] .srcs li.grp{font-family:var(--f-ar);font-size:calc(var(--u)*1.05)}
+.srcs a{text-decoration:none;color:var(--paper)}
+.srcs a:hover{color:var(--accent)}
+.srcs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.srcs span{color:var(--mute)}
+
+.split.money{grid-template-columns:minmax(0,1fr) calc(var(--u)*25)}
+.badge{justify-self:start}
+
+/* phone versions of the chart, the engine flow and the money table */
+.mchart{display:grid;gap:14px}
+.mc-cap{font-size:12.5px;line-height:1.5;color:var(--mute)}
+.mrow{display:grid;gap:7px}
+.mtop{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.mn{font-size:15px;color:var(--paper)}
+.mn small{font:400 12px/1 var(--f-mono);color:var(--mute);margin-inline-start:4px}
+.mn em{font-style:normal;font:500 11px/1 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-inline-start:6px}
+html[lang="ar"] .mn em{font-family:var(--f-ar);font-size:12px}
+.mtop b{font:600 15px/1 var(--f-mono);color:var(--paper);white-space:nowrap}
+.mrow.hot .mn,.mrow.hot .mtop b{color:var(--accent)}
+.mtrack{position:relative;height:12px;background:var(--wash)}
+.mtrack i{position:absolute;top:0;bottom:0}
+.mband{background:rgba(250,250,248,.25)}
+.mrange{background:var(--paper-3)}
+.mrow.hot .mrange{background:var(--accent)}
+.mflow{list-style:none;padding:0;display:grid;gap:14px}
+.mflow li{position:relative;display:grid;gap:4px;padding:12px 14px;border:1px solid var(--paper-3);border-radius:8px;background:rgba(11,11,12,.78)}
+.mflow li.ai{border-color:var(--accent);background:rgba(40,16,8,.85)}
+.mflow li.bank{border:1.5px dashed var(--accent);background:rgba(11,11,12,.78)}
+.mflow li.flow::after{content:"";position:absolute;inset-inline-start:24px;bottom:-15px;width:2px;height:14px;background:var(--paper-3)}
+.mflow b{font-size:16px;color:var(--paper)}
+.mflow span{font-size:14px;line-height:1.45;color:var(--paper-2)}
+.mflow .mtag{font:500 11px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.mflow li.ai .mtag,.mflow li.bank .mtag{color:var(--accent)}
+html[lang="ar"] .mflow .mtag{font-family:var(--f-ar);font-size:12px}
+.mflow .mloop{color:var(--accent);font-size:13.5px}
+.mflow .mloop::before{content:"\21BA  "}
+.mcards{display:none;gap:14px}
+.mcard{display:grid;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.mcard .mh{font-family:var(--f-display);font-weight:700;font-size:18px;color:var(--paper)}
+html[lang="ar"] .mcard .mh{font-family:var(--f-ar)}
+.mcard dl{margin:0;display:grid;gap:6px}
+.mcard dl div{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.mcard dt{font-size:14px;color:var(--paper-2)}
+.mcard dd{margin:0;font:600 14px/1.3 var(--f-mono);color:var(--paper);white-space:nowrap}
+html[lang="ar"] .mcard dd{font-family:var(--f-ar)}
+.mcard.hot dd{color:var(--accent)}
+
+/* scrolling column for narrow, portrait or short screens */
+@media (max-width:760px),(max-aspect-ratio:1/1),(max-height:540px){
+  :root{--u:clamp(10.5px,calc(100vw / 34),13.5px)}
+  .brand .sub{display:none}
+  .risks .row.head{display:none}
+  .tblwrap{display:none}
+  .mcards{display:grid}
+  .src{font-size:12px}
+  .badge{font-size:11px}
+  .lede,.body,.stat .t,.q p,.risks .ct,.rank p,.cols3 li,.note p,.bar .meta,.steps li,.ph span,.srcs li{font-size:max(15px,calc(var(--u)*1.25))}
+  .rg{font-size:15px}
+  .rg .nm small,.cols3 h3,.note h3,.srcs li.grp,.ph .wl,.tot .l{font-size:12px}
+  .seg{font-size:10px}
+  body{overflow-y:auto;overflow-x:hidden}
+  .deck{position:relative;inset:auto;padding-top:calc(env(safe-area-inset-top,0px) + 58px)}
+  .slide{position:relative;left:auto;top:auto;transform:none;width:auto;height:auto;opacity:1;visibility:visible;padding:calc(var(--u)*4) 0 calc(var(--u)*6);border-bottom:1px solid var(--line);transition:none;gap:calc(var(--u)*2.4)}
+  .slide .a{animation:none!important}
+  .chrome{background:linear-gradient(var(--ink) 65%,rgba(11,11,12,0))}
+  .h1{font-size:calc(var(--u)*4.4)}
+  html[lang="ar"] .h1{font-size:calc(var(--u)*4)}
+  .statement{font-size:calc(var(--u)*3.1)}
+  .stats,.stats.three,.quad,.cols3,.split,.split.money{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rg{grid-template-columns:minmax(0,1fr) calc(var(--u)*7)}
+  .rg .track{grid-column:1 / -1;grid-row:2}
+  .scale{display:none}
+  .bar{grid-template-columns:minmax(0,1fr)}
+  .bar .v{grid-row:auto}
+  .bar .meta{flex-direction:column;gap:4px}
+  .rank li{grid-template-columns:minmax(0,1fr) auto}
+  .rank li p{grid-column:1 / -1}
+  .risks .row{grid-template-columns:minmax(0,1fr);gap:6px}
+  .weeks{grid-template-columns:minmax(0,1fr)}
+  .wk{display:none}
+  .ph{grid-row:auto!important;grid-column:auto!important}
+  .figure{overflow-x:auto}
+  .srcs{columns:1}
+  .title-foot{flex-direction:column;align-items:flex-start}
+  .nav,.progress,#fsBtn,.hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><canvas id="bgCanvas"></canvas></div>
+<div class="shade" aria-hidden="true"></div>
+
+<header class="chrome">
+  <div class="brand"><b><span class="en">El Moasser</span><span class="ar">المعاصر</span></b><span class="sub"><span class="x">·</span> <span class="en">Writing Engine</span><span class="ar">محرّك الكتابة</span></span></div>
+  <div class="tools">
+    <span class="counter" id="counter" dir="ltr">01 / 18</span>
+    <button class="btn" id="langBtn" type="button"><span class="en arl" lang="ar">عربي</span><span class="ar">English</span></button>
+    <button class="btn" id="fsBtn" type="button"><span class="en">Full screen</span><span class="ar">ملء الشاشة</span></button>
+  </div>
+</header>
+
+<main class="deck" id="deck">
+<section class="slide s-title is-active">
+  <p class="eyebrow a" style="--i:0"><span class="en">Prepared for El Moasser · October 2026</span><span class="ar">مُعدّ للمعاصر · أكتوبر 2026</span></p>
+  <h1 class="h1 a" style="--i:1"><span class="en">The El Moasser Writing Engine</span><span class="ar">محرّك الكتابة للمعاصر</span></h1>
+  <p class="lede a" style="--i:2"><span class="en">How AI can help El Moasser publish faster and with fewer errors, while every decision stays with its own team.</span><span class="ar">كيف يساعد الذكاء الاصطناعي المعاصر على النشر بسرعة أكبر وبأخطاء أقل، مع بقاء كل قرار في يد فريقها.</span></p>
+  <div class="title-foot a mt-auto" style="--i:3">
+    <span class="by"><span class="en">El Moasser</span><span class="ar">المعاصر</span></span>
+    <span class="hint"><span class="en">Use the arrow keys or Space to move between slides</span><span class="ar">استخدم مفاتيح الأسهم أو مفتاح المسافة للتنقل بين الشرائح</span></span>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Why now</span><span class="ar">لماذا الآن</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">This school year decides who leads the next curriculum cycle.</span><span class="ar">هذا العام الدراسي سيحدد من يقود دورة المناهج القادمة.</span></h2>
+  <div class="stats three mt-auto">
+    <div class="stat hot a" style="--i:2">
+      <div class="v"><bdi dir="ltr">160</bdi></div>
+      <p class="t"><span class="en">curricula are being developed for 2026/27, including the new Baccalaureate. Each one needs a new external book, on a deadline.</span><span class="ar">منهجًا يجري تطويرها للعام الدراسي <bdi dir="ltr">2026/2027</bdi>، ومنها مناهج البكالوريا الجديدة. وكل منهج يحتاج إلى كتاب خارجي جديد في موعد محدد.</span></p>
+      <p class="src"><span class="en">Akhbar El Yom, 10 Sep 2026</span><span class="ar">أخبار اليوم، 10 سبتمبر 2026</span></p>
+    </div>
+    <div class="stat a" style="--i:3">
+      <div class="v"><span class="en">Free</span><span class="ar word">مجانًا</span></div>
+      <p class="t"><span class="en">Since September 2025 the Ministry prints its own assessment books, with weekly tests and exam models, as an alternative to external books.</span><span class="ar">منذ سبتمبر 2025 تطبع الوزارة كتب التقييمات الخاصة بها، بما فيها من اختبارات أسبوعية ونماذج امتحانات، بديلًا عن الكتب الخارجية.</span></p>
+      <p class="src"><span class="en">El Watan, 19 Sep 2025</span><span class="ar">الوطن، 19 سبتمبر 2025</span></p>
+    </div>
+    <div class="stat a" style="--i:4">
+      <div class="v"><bdi dir="ltr">30–40%</bdi></div>
+      <p class="t"><span class="en">is Selah El Telmeez's target share of the preparatory market within 6 to 10 years. Its owners plan EGP 200–400M of investment, and the company is building an AI learning platform.</span><span class="ar">هي الحصة التي تستهدفها سلاح التلميذ من سوق المرحلة الإعدادية خلال 6 إلى 10 سنوات. ويخطط ملّاكها لاستثمارات بين 200 و400 مليون جنيه، وتعمل الشركة على منصة تعليمية مدعومة بالذكاء الاصطناعي.</span></p>
+      <p class="src"><span class="en">Al Mal, Feb and May 2026</span><span class="ar">جريدة المال، فبراير ومايو 2026</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Our view</span><span class="ar">رؤيتنا</span></p>
+  <p class="statement a mt-auto" style="--i:1"><span class="en">AI will make drafting cheaper for every publisher. <em>Speed and accuracy</em> will decide who wins.</span><span class="ar">سيجعل الذكاء الاصطناعي الكتابة أرخص لكل الناشرين. أما <em>السرعة والدقة</em> فهما ما سيحسم المنافسة.</span></p>
+  <p class="lede a" style="--i:2"><span class="en">The goal is to be first on the shelf after every curriculum change, with fewer mistakes than anyone else.</span><span class="ar">الهدف أن تكون المعاصر أول من يصل إلى المكتبات بعد كل تغيير في المناهج، وبأخطاء أقل من أي منافس.</span></p>
+  <div class="mt-auto"></div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">How a book is made today</span><span class="ar">كيف يُصنع الكتاب اليوم</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Most of the effort goes into writing explanations, questions and answers.</span><span class="ar">يذهب معظم الجهد إلى كتابة الشرح والأسئلة ونماذج الإجابة.</span></h2>
+  <div class="a mt-auto" style="--i:2;display:grid;gap:calc(var(--u)*1.1)">
+    <div class="hours" role="img" aria-label="Share of hours: planning 5%, explanations 20%, questions 30%, answer keys 10%, subject review 10%, language review 10%, design 15%">
+      <span class="seg c-plan" style="flex:5" dir="ltr">5%</span>
+      <span class="seg c-w1" style="flex:20" dir="ltr">20%</span>
+      <span class="seg c-w2" style="flex:30" dir="ltr">30%</span>
+      <span class="seg c-w3" style="flex:10" dir="ltr">10%</span>
+      <span class="seg c-r1" style="flex:10" dir="ltr">10%</span>
+      <span class="seg c-r2" style="flex:10" dir="ltr">10%</span>
+      <span class="seg c-d" style="flex:15" dir="ltr">15%</span>
+    </div>
+    <p class="hours-cap"><span class="en"><b>About 60% of the hours</b> go to writing explanations, questions and answer keys.</span><span class="ar"><b>نحو <bdi dir="ltr">60%</bdi> من الساعات</b> تذهب إلى كتابة الشرح والأسئلة ونماذج الإجابة.</span></p>
+  </div>
+  <ol class="steps a" style="--i:3">
+    <li><span><i class="chip c-plan"></i><span class="en">Curriculum and exam specs</span><span class="ar">استلام المنهج ومواصفات الامتحان</span></span></li>
+    <li><span><i class="chip c-plan"></i><span class="en">Book blueprint</span><span class="ar">خطة الكتاب</span></span></li>
+    <li><span><i class="chip c-w1"></i><span class="en">Explanations</span><span class="ar">الشرح</span></span></li>
+    <li><span><i class="chip c-w2"></i><span class="en">Questions and exercises</span><span class="ar">الأسئلة والتدريبات</span></span></li>
+    <li><span><i class="chip c-w3"></i><span class="en">Answer keys</span><span class="ar">نماذج الإجابة</span></span></li>
+    <li><span><i class="chip c-r1"></i><span class="en">Subject review</span><span class="ar">المراجعة العلمية</span></span></li>
+    <li><span><i class="chip c-r2"></i><span class="en">Language review</span><span class="ar">التدقيق اللغوي</span></span></li>
+    <li><span><i class="chip c-d"></i><span class="en">Design and proofs</span><span class="ar">الإخراج الفني والبروفات</span></span></li>
+    <li><span><span class="en">Ministry licensing</span><span class="ar">ترخيص الوزارة</span></span></li>
+    <li><span><span class="en">Print and errata</span><span class="ar">الطباعة وتصويب الأخطاء</span></span></li>
+  </ol>
+  <p class="src a" style="--i:4"><span class="en">Hour shares are our estimate. In week one of the pilot we replace them with your own timesheets.</span><span class="ar">نسب الساعات تقديرية، وفي الأسبوع الأول من المشروع التجريبي نستبدلها ببيانات فريقكم الفعلية.</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">What the research shows</span><span class="ar">ماذا تقول الأبحاث</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">AI already drafts exam questions close to human quality.</span><span class="ar">يكتب الذكاء الاصطناعي بالفعل أسئلة امتحانات بجودة قريبة من جودة الكتابة البشرية.</span></h2>
+  <div class="stats mt-auto">
+    <div class="stat hot a" style="--i:2">
+      <div class="v"><bdi dir="ltr">81.7%</bdi></div>
+      <p class="t"><span class="en">of 651 AI drafted exam questions passed every quality check</span><span class="ar">من 651 سؤال امتحان كتبها الذكاء الاصطناعي اجتازت جميع معايير الجودة</span></p>
+      <p class="src">Doughty et al., 2024</p>
+    </div>
+    <div class="stat a" style="--i:3">
+      <div class="v"><bdi dir="ltr">79%</bdi></div>
+      <p class="t"><span class="en">of 900 AI generated test tasks were kept after expert review at Duolingo</span><span class="ar">من 900 مهمة اختبار أنتجها الذكاء الاصطناعي في <bdi>Duolingo</bdi> بقيت بعد مراجعة الخبراء</span></p>
+      <p class="src">Runge et al., 2024</p>
+    </div>
+    <div class="stat a" style="--i:4">
+      <div class="v cmp"><span class="en">4.8%<small> vs </small>12%</span><span class="ar"><bdi dir="ltr">4.8%</bdi><small> مقابل </small><bdi dir="ltr">12%</bdi></span></div>
+      <p class="t"><span class="en">of questions missed the lesson goal: AI drafts against human drafts</span><span class="ar">من الأسئلة خرجت عن هدف الدرس: مسودات الذكاء الاصطناعي مقابل المسودات البشرية</span></p>
+      <p class="src">Doughty et al., 2024</p>
+    </div>
+    <div class="stat a" style="--i:5">
+      <div class="v"><bdi dir="ltr">92.8%</bdi></div>
+      <p class="t"><span class="en">of AI math word problems for grades 3 to 5 met every criterion, scored by an automated rater</span><span class="ar">من المسائل الرياضية اللفظية للصفوف من الثالث إلى الخامس استوفت جميع المعايير، بحسب مقيّم آلي</span></p>
+      <p class="src">Christ et al., 2025</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">The catch</span><span class="ar">التحدي</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Before review, AI makes about four times more serious errors, and it cannot reliably check itself.</span><span class="ar">قبل المراجعة، يرتكب الذكاء الاصطناعي أخطاءً جسيمة بنحو أربعة أضعاف البشر، ولا يستطيع مراجعة نفسه بشكل موثوق.</span></h2>
+  <div class="stats mt-auto">
+    <div class="stat hot a" style="--i:2">
+      <div class="v cmp"><span class="en">4.9%<small> vs </small>1.1%</span><span class="ar"><bdi dir="ltr">4.9%</bdi><small> مقابل </small><bdi dir="ltr">1.1%</bdi></span></div>
+      <p class="t"><span class="en">of questions had two correct answers: AI against human, before review</span><span class="ar">من الأسئلة كانت لها إجابتان صحيحتان: الذكاء الاصطناعي مقابل البشر، قبل المراجعة</span></p>
+      <p class="src">Doughty et al., 2024</p>
+    </div>
+    <div class="stat hot a" style="--i:3">
+      <div class="v"><bdi dir="ltr">27–35%</bdi></div>
+      <p class="t"><span class="en">of flaws are caught when AI reviews questions written by AI</span><span class="ar">فقط من العيوب يكتشفها الذكاء الاصطناعي عندما يراجع أسئلة كتبها ذكاء اصطناعي</span></p>
+      <p class="src">Moore and Diana, 2026</p>
+    </div>
+    <div class="stat a" style="--i:4">
+      <div class="v"><bdi dir="ltr">40%</bdi></div>
+      <p class="t"><span class="en">of AI's suggested Arabic grammar fixes were correct. It finds 84% of errors but changes too much.</span><span class="ar">فقط من تصحيحات الذكاء الاصطناعي المقترحة للنحو العربي كانت صحيحة. يكتشف <bdi dir="ltr">84%</bdi> من الأخطاء لكنه يُفرط في التعديل.</span></p>
+      <p class="src">Mohi et al., 2026</p>
+    </div>
+    <div class="stat a" style="--i:5">
+      <div class="v"><bdi dir="ltr">46.2%</bdi></div>
+      <p class="t"><span class="en">of 2,770 human written exam questions broke question writing rules. Human work needs checking too.</span><span class="ar">من <bdi dir="ltr">2,770</bdi> سؤالًا كتبها بشر خالفت قواعد كتابة الأسئلة. العمل البشري أيضًا يحتاج إلى مراجعة.</span></p>
+      <p class="src">Tarrant et al., 2006</p>
+    </div>
+  </div>
+  <p class="verdict a" style="--i:6"><span class="en">So AI replaces writing time. Review stays human.</span><span class="ar">لذلك يوفّر الذكاء الاصطناعي وقت الكتابة، وتبقى المراجعة بشرية.</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Measured time savings</span><span class="ar">توفير الوقت في التجارب الفعلية</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">In real work, AI cuts drafting time by a quarter to more than half.</span><span class="ar">في بيئات العمل الفعلية، يخفّض الذكاء الاصطناعي وقت الكتابة بما بين الربع وأكثر من النصف.</span></h2>
+  <div class="bars mt-auto">
+    <div class="bar a" style="--i:2">
+      <div class="v"><bdi dir="ltr">25%</bdi></div>
+      <div class="track"><i style="--w:25%"></i></div>
+      <div class="meta"><span><span class="en">BCG field study, 758 consultants</span><span class="ar">دراسة ميدانية في <bdi>BCG</bdi> شملت 758 استشاريًا</span></span><span class="src">Dell'Acqua et al., 2023</span></div>
+    </div>
+    <div class="bar a" style="--i:3">
+      <div class="v"><bdi dir="ltr">40%</bdi></div>
+      <div class="track"><i style="--w:40%"></i></div>
+      <div class="meta"><span><span class="en">Writing tasks, 453 professionals</span><span class="ar">مهام كتابة شملت 453 مهنيًا</span></span><span class="src">Noy and Zhang, Science, 2023</span></div>
+    </div>
+    <div class="bar hot a" style="--i:4">
+      <div class="v"><small class="en">up to </small><small class="ar">حتى </small><bdi dir="ltr">60%</bdi></div>
+      <div class="track"><i style="--w:60%"></i></div>
+      <div class="meta"><span><span class="en">McGraw Hill content and question tool, select cases</span><span class="ar">أداة <bdi>McGraw Hill</bdi> للمحتوى والأسئلة، في حالات مختارة</span></span><span class="src">McGraw Hill, June 2026</span></div>
+    </div>
+  </div>
+  <p class="body a" style="--i:5;max-width:calc(var(--u)*80)"><span class="en">The BCG study also found people were 19 percentage points less accurate on tasks outside AI's strengths. Expert judgment matters more, not less.</span><span class="ar">ووجدت دراسة <bdi>BCG</bdi> أيضًا أن دقة المشاركين انخفضت 19 نقطة مئوية في المهام الواقعة خارج نقاط قوة الذكاء الاصطناعي. أي أن خبرة المراجع تزداد أهمية.</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Step by step</span><span class="ar">خطوة بخطوة</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">AI can take 40–55% of editorial hours. Not 90%.</span><span class="ar">يمكن للذكاء الاصطناعي أن يتولى <bdi dir="ltr">40–55%</bdi> من ساعات العمل التحريري، وليس <bdi dir="ltr">90%</bdi>.</span></h2>
+  <div class="split mt-auto">
+    <div class="a" style="--i:2;display:grid;gap:calc(var(--u)*.8);min-width:0">
+      <div class="scale" aria-hidden="true"><span></span><span><span>0</span><span>50</span><span><bdi dir="ltr">100%</bdi></span></span><span></span></div>
+      <div class="ranges">
+        <div class="rg"><span class="nm"><span class="en">Answer keys</span><span class="ar">نماذج الإجابة</span></span><span class="track"><i style="--lo:80%;--hi:90%"></i></span><span class="val"><bdi dir="ltr">80–90%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Questions and exercises</span><span class="ar">الأسئلة والتدريبات</span></span><span class="track"><i style="--lo:70%;--hi:80%"></i></span><span class="val"><bdi dir="ltr">70–80%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Explanations</span><span class="ar">الشرح</span></span><span class="track"><i style="--lo:60%;--hi:70%"></i></span><span class="val"><bdi dir="ltr">60–70%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Book blueprint</span><span class="ar">خطة الكتاب</span></span><span class="track"><i style="--lo:50%;--hi:60%"></i></span><span class="val"><bdi dir="ltr">50–60%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Language review</span><span class="ar">التدقيق اللغوي</span><small><span class="en">AI flags only</span><span class="ar">تنبيه آلي فقط</span></small></span><span class="track"><i style="--lo:50%;--hi:60%"></i></span><span class="val"><bdi dir="ltr">50–60%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Subject review</span><span class="ar">المراجعة العلمية</span><small><span class="en">AI sorts only</span><span class="ar">فرز آلي فقط</span></small></span><span class="track"><i style="--lo:30%;--hi:40%"></i></span><span class="val"><bdi dir="ltr">30–40%</bdi></span></div>
+        <div class="rg"><span class="nm"><span class="en">Design and typesetting</span><span class="ar">الإخراج الفني</span></span><span class="track"><i style="--lo:20%;--hi:30%"></i></span><span class="val"><bdi dir="ltr">20–30%</bdi></span></div>
+      </div>
+    </div>
+    <div class="totals a" style="--i:3">
+      <div class="tot"><div class="v"><bdi dir="ltr">55–65%</bdi></div><div class="l"><span class="en">Ceiling, weighted by hours</span><span class="ar">الحد الأقصى، مرجّحًا بساعات العمل</span></div></div>
+      <div class="tot hot"><div class="v"><bdi dir="ltr">40–55%</bdi></div><div class="l"><span class="en">Realistic, after extra review time</span><span class="ar">الواقعي بعد احتساب وقت المراجعة الإضافي</span></div></div>
+      <div class="tot"><div class="v"><bdi dir="ltr">25–40%</bdi></div><div class="l"><span class="en">Year one, while teams learn</span><span class="ar">العام الأول، خلال فترة التعلّم</span></div></div>
+    </div>
+  </div>
+  <p class="src a" style="--i:4"><span class="en">AI writes the first draft. A person on your team edits or approves every item.</span><span class="ar">يكتب الذكاء الاصطناعي المسودة الأولى، ويعدّل أحد أفراد فريقكم كل عنصر أو يعتمده.</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">How far to automate</span><span class="ar">إلى أي حد نعتمد على الذكاء الاصطناعي</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Errors jump when human review is cut, not when AI drafts more.</span><span class="ar">تقفز الأخطاء عند تقليص المراجعة البشرية، لا عند زيادة ما يكتبه الذكاء الاصطناعي.</span></h2>
+  <div class="split mt-auto">
+    <div class="figure a" style="--i:2" id="scenarioChart"></div>
+    <div class="side a" style="--i:3">
+      <p class="body"><span class="en">Up to about half the hours, AI leaves no more wrong questions than today, as long as two full human review passes stay.</span><span class="ar">حتى نصف الساعات تقريبًا، لا يزيد عدد الأسئلة الخاطئة عن مستواه الحالي، طالما بقيت جولتا مراجعة بشرية كاملتان.</span></p>
+      <p class="body"><span class="en">Cut review to a sample and wrong questions per book rise 15 to 25 times.</span><span class="ar">أما تقليص المراجعة إلى عينة فيرفع عدد الأسئلة الخاطئة في الكتاب بين 15 و25 ضعفًا.</span></p>
+      <p class="src"><span class="en">Assumes 1,500 questions per book. Serious errors before review: AI 5–8%, human 1–4% (Doughty et al., 2024). Each human review pass catches 80% and a second model solving every question catches 60% (our assumptions).</span><span class="ar">على افتراض <bdi dir="ltr">1,500</bdi> سؤال في الكتاب. الأخطاء الجسيمة قبل المراجعة: <bdi dir="ltr">5–8%</bdi> للذكاء الاصطناعي و<bdi dir="ltr">1–4%</bdi> للبشر (<bdi>Doughty et al., 2024</bdi>). كل جولة مراجعة بشرية تكتشف <bdi dir="ltr">80%</bdi> من الأخطاء، وحلّ نموذج ثانٍ لكل سؤال يكتشف <bdi dir="ltr">60%</bdi> (افتراضاتنا).</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">What we build</span><span class="ar">ما الذي سنبنيه</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">AI drafts and checks. Your people decide.</span><span class="ar">الذكاء الاصطناعي يكتب ويتحقق، وفريقكم يقرر.</span></h2>
+  <div class="figure eng-wrap a mt-auto" style="--i:2;max-width:calc(var(--u)*80)" id="engineDiagram"></div>
+  <p class="body a" style="--i:3"><span class="en">Every reviewer edit feeds back into the engine, so it learns your team's judgment. No competitor can buy that.</span><span class="ar">كل تعديل من المراجعين يعود إلى المحرّك فيتعلّم خبرة فريقكم، وهذا ما لا يستطيع أي منافس شراءه.</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Where to start</span><span class="ar">من أين نبدأ</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Start where answers can be checked and El Moasser is strongest.</span><span class="ar">نبدأ حيث يمكن التحقق من الإجابات، وحيث تتفوق المعاصر.</span></h2>
+  <ol class="rank a mt-auto" style="--i:2">
+    <li><span class="nm"><span class="en">English</span><span class="ar">اللغة الإنجليزية</span></span><p><span class="en">Your strongest brand, and the language AI handles best.</span><span class="ar">أقوى علامات المعاصر، واللغة التي يتقنها الذكاء الاصطناعي أكثر من غيرها.</span></p><span class="badge go"><span class="en">Pilot</span><span class="ar">التجربة</span></span></li>
+    <li><span class="nm"><span class="en">Mathematics</span><span class="ar">الرياضيات</span></span><p><span class="en">Every answer can be checked by code.</span><span class="ar">يمكن التحقق من كل إجابة برمجيًا.</span></p><span class="badge go"><span class="en">Pilot</span><span class="ar">التجربة</span></span></li>
+    <li><span class="nm"><span class="en">Science</span><span class="ar">العلوم</span></span><p><span class="en">A second model solves every question again.</span><span class="ar">يعيد نموذج ثانٍ حل كل سؤال للتأكد من الإجابة.</span></p><span class="badge go"><span class="en">Pilot</span><span class="ar">التجربة</span></span></li>
+    <li><span class="nm"><span class="en">Social studies</span><span class="ar">الدراسات الاجتماعية</span></span><p><span class="en">Facts are checked against the Ministry book.</span><span class="ar">تُطابَق المعلومات مع كتاب الوزارة.</span></p><span class="badge"><span class="en">Next</span><span class="ar">التالي</span></span></li>
+    <li><span class="nm"><span class="en">Arabic language</span><span class="ar">اللغة العربية</span></span><p><span class="en">AI is weakest on grammar, so linguists lead and AI only flags.</span><span class="ar">الذكاء الاصطناعي أضعف ما يكون في النحو، لذا يقود اللغويون العمل ويقتصر دوره على التنبيه.</span></p><span class="badge"><span class="en">Last</span><span class="ar">أخيرًا</span></span></li>
+  </ol>
+  <p class="src a" style="--i:3"><span class="en">On real Arab school exams, the leading model of 2024 scored 44.6% on high school Arabic language, against 72.5% overall (Koto et al., 2024). Current models score 91 to 93 on a general Arabic reasoning index (Artificial Analysis, 2026).</span><span class="ar">في امتحانات مدرسية عربية حقيقية، سجّل النموذج الأبرز عام 2024 نسبة <bdi dir="ltr">44.6%</bdi> في اللغة العربية للمرحلة الثانوية، مقابل <bdi dir="ltr">72.5%</bdi> إجمالًا (<bdi>Koto et al., 2024</bdi>). وتسجّل النماذج الحالية بين 91 و93 على مؤشر عام للاستدلال باللغة العربية (<bdi>Artificial Analysis, 2026</bdi>).</span></p>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">What it changes</span><span class="ar">ما الذي سيتغير</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">The real gains come after the first draft.</span><span class="ar">المكاسب الحقيقية تأتي بعد المسودة الأولى.</span></h2>
+  <div class="quad mt-auto">
+    <div class="q a" style="--i:2"><h3><span class="en">First on the shelf</span><span class="ar">الأولى في المكتبات</span></h3><p><span class="en">Ship the new 2026/27 books before competitors and win teacher recommendations early.</span><span class="ar">إصدار كتب مناهج <bdi dir="ltr">2026/2027</bdi> قبل المنافسين، وكسب توصيات المعلمين مبكرًا.</span></p></div>
+    <div class="q a" style="--i:3"><h3><span class="en">More titles, same team</span><span class="ar">عناوين أكثر بالفريق نفسه</span></h3><p><span class="en">Levels, revision booklets and Gulf editions with little extra writing.</span><span class="ar">مستويات متعددة وكتيبات مراجعة وطبعات خليجية بجهد كتابة إضافي محدود.</span></p></div>
+    <div class="q a" style="--i:4"><h3><span class="en">Trust becomes the brand</span><span class="ar">الثقة تصبح العلامة التجارية</span></h3><p><span class="en">Drafted by AI, verified by teachers, with a public errata page. South Korea stripped AI textbooks of textbook status in August 2025 after a backlash, having spent about $385M.</span><span class="ar">يكتبها الذكاء الاصطناعي ويراجعها المعلمون، مع صفحة علنية لتصويب الأخطاء. فقد ألغت كوريا الجنوبية صفة الكتاب المدرسي عن كتب الذكاء الاصطناعي في أغسطس 2025 بعد موجة اعتراض، وبعد إنفاق نحو <bdi dir="ltr">385</bdi> مليون دولار.</span></p></div>
+    <div class="q a" style="--i:5"><h3><span class="en">A data flywheel</span><span class="ar">حلقة نمو قائمة على البيانات</span></h3><p><span class="en">Every approved question enters a tagged bank that feeds apps, adaptive practice and the next books. Start it in preparatory and secondary, where Selah El Telmeez is only starting.</span><span class="ar">كل سؤال معتمد يدخل بنكًا مصنّفًا يغذي التطبيقات والتدريب التكيفي والكتب القادمة. ونبدأ به في المرحلتين الإعدادية والثانوية، حيث ما زالت سلاح التلميذ في بدايتها.</span></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">What could go wrong</span><span class="ar">المخاطر وضوابطها</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Every risk has a known control.</span><span class="ar">لكل خطر ضابط معروف.</span></h2>
+  <div class="risks a mt-auto" style="--i:2">
+    <div class="row head"><span><span class="en">Risk</span><span class="ar">الخطر</span></span><span><span class="en">Control</span><span class="ar">الضابط</span></span></div>
+    <div class="row"><span class="rk"><span class="en">A wrong answer reaches print</span><span class="ar">وصول إجابة خاطئة إلى المطبعة</span></span><span class="ct"><span class="en">Two full human review passes, a second model solving every question, and blind audits each term.</span><span class="ar">جولتا مراجعة بشرية كاملتان، وحلّ كل سؤال بنموذج ثانٍ، وتدقيق معمّى كل فصل دراسي.</span></span></div>
+    <div class="row"><span class="rk"><span class="en">Arabic grammar and diacritics</span><span class="ar">النحو العربي والتشكيل</span></span><span class="ct"><span class="en">AI flags, linguists decide. Arabic titles come last.</span><span class="ar">الذكاء الاصطناعي ينبّه واللغويون يقررون، وكتب اللغة العربية تأتي في النهاية.</span></span></div>
+    <div class="row"><span class="rk"><span class="en">Content drifts from the curriculum</span><span class="ar">خروج المحتوى عن المنهج</span></span><span class="ct"><span class="en">Every draft is built on the Ministry book and checked for alignment.</span><span class="ar">كل مسودة مبنية على كتاب الوزارة وتخضع لفحص التوافق مع المنهج.</span></span></div>
+    <div class="row"><span class="rk"><span class="en">Authors resist</span><span class="ar">مقاومة المؤلفين</span></span><span class="ct"><span class="en">Authors become paid reviewers and named editors, and help design the tool.</span><span class="ar">يتحول المؤلفون إلى مراجعين ومحررين بأسمائهم وبمقابل، ويشاركون في تصميم الأداة.</span></span></div>
+    <div class="row"><span class="rk"><span class="en">Backlash against AI books</span><span class="ar">رد فعل سلبي تجاه كتب الذكاء الاصطناعي</span></span><span class="ct"><span class="en">Drafted by AI, verified by teachers. A public errata page, and the Ministry kept informed.</span><span class="ar">يكتبها الذكاء الاصطناعي ويراجعها المعلمون، مع صفحة علنية للتصويب وإطلاع الوزارة أولًا بأول.</span></span></div>
+    <div class="row"><span class="rk"><span class="en">Your files leak</span><span class="ar">تسرّب الملفات</span></span><span class="ct"><span class="en">Enterprise terms that forbid training on your data, or a private deployment in your own cloud.</span><span class="ar">اتفاقيات مؤسسية تمنع التدريب على بياناتكم، أو تشغيل خاص على سحابتكم.</span></span></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">The economics</span><span class="ar">الجدوى الاقتصادية</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Savings come from editorial hours, not from paper.</span><span class="ar">التوفير يأتي من ساعات العمل التحريري، لا من الورق.</span></h2>
+  <div class="split money mt-auto">
+    <div class="a" style="--i:2;min-width:0">
+      <div class="tblwrap">
+        <table class="tbl">
+          <thead><tr>
+            <th><span class="en">Editorial spend per title</span><span class="ar">التكلفة التحريرية للعنوان</span></th>
+            <th><span class="en">Per year, 800 titles</span><span class="ar">سنويًا لـ 800 عنوان</span></th>
+            <th><span class="en">Year one saving</span><span class="ar">توفير العام الأول</span><br><bdi dir="ltr">25–40%</bdi></th>
+            <th><span class="en">Steady state saving</span><span class="ar">التوفير عند الاستقرار</span><br><bdi dir="ltr">40–55%</bdi></th>
+          </tr></thead>
+          <tbody>
+            <tr><td><span class="en">EGP 30,000</span><span class="ar"><bdi dir="ltr">30,000</bdi> جنيه</span></td><td><span class="en">EGP 24M</span><span class="ar">24 مليون جنيه</span></td><td><span class="en">EGP 6–9.6M</span><span class="ar"><bdi dir="ltr">6–9.6</bdi> مليون</span></td><td><span class="en">EGP 9.6–13.2M</span><span class="ar"><bdi dir="ltr">9.6–13.2</bdi> مليون</span></td></tr>
+            <tr><td><span class="en">EGP 60,000</span><span class="ar"><bdi dir="ltr">60,000</bdi> جنيه</span></td><td><span class="en">EGP 48M</span><span class="ar">48 مليون جنيه</span></td><td class="hot"><span class="en">EGP 12–19.2M</span><span class="ar"><bdi dir="ltr">12–19.2</bdi> مليون</span></td><td class="hot"><span class="en">EGP 19.2–26.4M</span><span class="ar"><bdi dir="ltr">19.2–26.4</bdi> مليون</span></td></tr>
+            <tr><td><span class="en">EGP 120,000</span><span class="ar"><bdi dir="ltr">120,000</bdi> جنيه</span></td><td><span class="en">EGP 96M</span><span class="ar">96 مليون جنيه</span></td><td><span class="en">EGP 24–38.4M</span><span class="ar"><bdi dir="ltr">24–38.4</bdi> مليون</span></td><td><span class="en">EGP 38.4–52.8M</span><span class="ar"><bdi dir="ltr">38.4–52.8</bdi> مليون</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mcards">
+        <div class="mcard"><div class="mh"><span class="en">EGP 30,000 per title</span><span class="ar"><bdi dir="ltr">30,000</bdi> جنيه للعنوان</span></div><dl>
+          <div><dt><span class="en">Per year, 800 titles</span><span class="ar">سنويًا لـ 800 عنوان</span></dt><dd><span class="en">EGP 24M</span><span class="ar">24 مليون جنيه</span></dd></div>
+          <div><dt><span class="en">Year one saving</span><span class="ar">توفير العام الأول</span></dt><dd><span class="en">EGP 6–9.6M</span><span class="ar"><bdi dir="ltr">6–9.6</bdi> مليون</span></dd></div>
+          <div><dt><span class="en">Steady state saving</span><span class="ar">التوفير عند الاستقرار</span></dt><dd><span class="en">EGP 9.6–13.2M</span><span class="ar"><bdi dir="ltr">9.6–13.2</bdi> مليون</span></dd></div></dl></div>
+        <div class="mcard hot"><div class="mh"><span class="en">EGP 60,000 per title</span><span class="ar"><bdi dir="ltr">60,000</bdi> جنيه للعنوان</span></div><dl>
+          <div><dt><span class="en">Per year, 800 titles</span><span class="ar">سنويًا لـ 800 عنوان</span></dt><dd><span class="en">EGP 48M</span><span class="ar">48 مليون جنيه</span></dd></div>
+          <div><dt><span class="en">Year one saving</span><span class="ar">توفير العام الأول</span></dt><dd><span class="en">EGP 12–19.2M</span><span class="ar"><bdi dir="ltr">12–19.2</bdi> مليون</span></dd></div>
+          <div><dt><span class="en">Steady state saving</span><span class="ar">التوفير عند الاستقرار</span></dt><dd><span class="en">EGP 19.2–26.4M</span><span class="ar"><bdi dir="ltr">19.2–26.4</bdi> مليون</span></dd></div></dl></div>
+        <div class="mcard"><div class="mh"><span class="en">EGP 120,000 per title</span><span class="ar"><bdi dir="ltr">120,000</bdi> جنيه للعنوان</span></div><dl>
+          <div><dt><span class="en">Per year, 800 titles</span><span class="ar">سنويًا لـ 800 عنوان</span></dt><dd><span class="en">EGP 96M</span><span class="ar">96 مليون جنيه</span></dd></div>
+          <div><dt><span class="en">Year one saving</span><span class="ar">توفير العام الأول</span></dt><dd><span class="en">EGP 24–38.4M</span><span class="ar"><bdi dir="ltr">24–38.4</bdi> مليون</span></dd></div>
+          <div><dt><span class="en">Steady state saving</span><span class="ar">التوفير عند الاستقرار</span></dt><dd><span class="en">EGP 38.4–52.8M</span><span class="ar"><bdi dir="ltr">38.4–52.8</bdi> مليون</span></dd></div></dl></div>
+        <p class="src"><span class="en">Year one saving assumes 25–40% of editorial spend; steady state 40–55%.</span><span class="ar">توفير العام الأول على أساس <bdi dir="ltr">25–40%</bdi> من التكلفة التحريرية، وعند الاستقرار <bdi dir="ltr">40–55%</bdi>.</span></p>
+      </div>
+      <p class="src" style="margin-top:calc(var(--u)*1.2)"><span class="en">Illustration only. We calculate your figure from your real editorial spend.</span><span class="ar">للتوضيح فقط. نحسب أرقامكم الفعلية من تكلفتكم التحريرية الحقيقية.</span></p>
+    </div>
+    <div class="notes a" style="--i:3">
+      <div class="note"><h3><span class="en">AI running cost</span><span class="ar">تكلفة تشغيل الذكاء الاصطناعي</span></h3><p><span class="en">About EGP 2,700–10,700 per title, or $50–200 at EGP 53.4 per dollar on 16 Oct 2026.</span><span class="ar">نحو <bdi dir="ltr">2,700–10,700</bdi> جنيه للعنوان، أي <bdi dir="ltr">$50–200</bdi> بسعر <bdi dir="ltr">53.4</bdi> جنيه للدولار في 16 أكتوبر 2026.</span></p></div>
+      <div class="note"><h3><span class="en">Price per copy</span><span class="ar">سعر النسخة</span></h3><p><span class="en">Will not drop much, because paper and printing drive it. The gain is more titles, sooner.</span><span class="ar">لن ينخفض كثيرًا لأن الورق والطباعة هما المحرك الأساسي لتكلفته. المكسب هو عناوين أكثر وفي وقت أسرع.</span></p></div>
+      <div class="note"><h3><span class="en">How sure we are</span><span class="ar">مدى ثقتنا</span></h3><p><span class="en">Medium on the percentages. Low on the totals until we see your numbers.</span><span class="ar">متوسطة في النسب، ومنخفضة في الإجماليات حتى نطّلع على أرقامكم.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">The proposal</span><span class="ar">المقترح</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Three new 2026/27 titles in 12 weeks, measured against your own team.</span><span class="ar">ثلاثة كتب من مناهج <bdi dir="ltr">2026/2027</bdi> خلال 12 أسبوعًا، تُقاس مقابل أداء فريقكم.</span></h2>
+  <div class="weeks a mt-auto" style="--i:2">
+    <span class="wk">1</span><span class="wk">2</span><span class="wk">3</span><span class="wk">4</span><span class="wk">5</span><span class="wk">6</span><span class="wk">7</span><span class="wk">8</span><span class="wk">9</span><span class="wk">10</span><span class="wk">11</span><span class="wk">12</span>
+    <div class="ph" style="grid-column:1 / span 2"><span class="wl"><span class="en">Weeks 1–2</span><span class="ar">الأسبوعان 1 و2</span></span><b><span class="en">Baseline</span><span class="ar">خط الأساس</span></b><span><span class="en">Timesheets, files, and a blind error audit of two current books</span><span class="ar">ساعات العمل والملفات، وتدقيق معمّى لكتابين حاليين</span></span></div>
+    <div class="ph" style="grid-column:3 / span 4"><span class="wl"><span class="en">Weeks 3–6</span><span class="ar">الأسابيع من 3 إلى 6</span></span><b><span class="en">Build</span><span class="ar">البناء</span></b><span><span class="en">English, Math and Science</span><span class="ar">الإنجليزية والرياضيات والعلوم</span></span></div>
+    <div class="ph hot" style="grid-column:7 / span 4"><span class="wl"><span class="en">Weeks 7–10</span><span class="ar">الأسابيع من 7 إلى 10</span></span><b><span class="en">Produce</span><span class="ar">الإنتاج</span></b><span><span class="en">Three books, each beside a human only control</span><span class="ar">ثلاثة كتب، لكل منها نسخة بشرية للمقارنة</span></span></div>
+    <div class="ph" style="grid-column:11 / span 2"><span class="wl"><span class="en">Weeks 11–12</span><span class="ar">الأسبوعان 11 و12</span></span><b><span class="en">Decide</span><span class="ar">القرار</span></b><span><span class="en">Measure, then scale or stop</span><span class="ar">القياس ثم التوسع أو التوقف</span></span></div>
+  </div>
+  <div class="cols3 a" style="--i:3">
+    <div><h3><span class="en">It passes only if</span><span class="ar">تنجح التجربة فقط إذا</span></h3><ul>
+      <li><span class="en">Author and editor hours fall 40% or more</span><span class="ar">انخفضت ساعات المؤلفين والمحررين بنسبة <bdi dir="ltr">40%</bdi> أو أكثر</span></li>
+      <li><span class="en">Serious errors are at or below the human control, in a blind audit</span><span class="ar">كانت الأخطاء الجسيمة مساوية للنسخة البشرية أو أقل منها في تدقيق معمّى</span></li>
+      <li><span class="en">The Ministry licenses the books on first submission</span><span class="ar">حصلت الكتب على ترخيص الوزارة من أول تقديم</span></li>
+      <li><span class="en">At least 70% of authors want to keep using it</span><span class="ar">رغب <bdi dir="ltr">70%</bdi> على الأقل من المؤلفين في الاستمرار في استخدامه</span></li>
+    </ul></div>
+    <div><h3><span class="en">We need from El Moasser</span><span class="ar">المطلوب من المعاصر</span></h3><ul>
+      <li><span class="en">Editable files of recent books</span><span class="ar">ملفات قابلة للتعديل لأحدث الكتب</span></li>
+      <li><span class="en">One subject lead and two authors per subject</span><span class="ar">رئيس قسم ومؤلفان لكل مادة</span></li>
+      <li><span class="en">One decision maker</span><span class="ar">صاحب قرار واحد</span></li>
+      <li><span class="en">A one hour review each week</span><span class="ar">اجتماع مراجعة أسبوعي لمدة ساعة</span></li>
+    </ul></div>
+    <div><h3><span class="en">You keep, whatever the result</span><span class="ar">يبقى لكم مهما كانت النتيجة</span></h3><ul>
+      <li><span class="en">A measured baseline of hours and error rates</span><span class="ar">قياس فعلي لساعات العمل ونسب الأخطاء</span></li>
+      <li><span class="en">A tagged back catalog for three subjects</span><span class="ar">أرشيف مصنّف لثلاث مواد</span></li>
+      <li><span class="en">A clear answer on AI, based on your own books</span><span class="ar">إجابة واضحة عن جدوى الذكاء الاصطناعي، مبنية على كتبكم أنتم</span></li>
+    </ul></div>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Ownership and safety</span><span class="ar">الملكية والأمان</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Your content, your question bank, your decisions.</span><span class="ar">محتواكم، وبنك أسئلتكم، وقراراتكم.</span></h2>
+  <div class="quad mt-auto">
+    <div class="q a" style="--i:2"><h3><span class="en">You own it</span><span class="ar">الملكية لكم</span></h3><p><span class="en">All content, the tagged question bank and every reviewer decision belong to El Moasser.</span><span class="ar">المحتوى كاملًا وبنك الأسئلة المصنّف وكل قرارات المراجعين ملك للمعاصر.</span></p></div>
+    <div class="q a" style="--i:3"><h3><span class="en">Free to switch</span><span class="ar">حرية التبديل</span></h3><p><span class="en">Built on commercial AI models, so we can change provider per subject as models improve.</span><span class="ar">النظام مبني على نماذج ذكاء اصطناعي تجارية، لذا يمكن تغيير المزوّد لكل مادة مع تطور النماذج.</span></p></div>
+    <div class="q a" style="--i:4"><h3><span class="en">Your files stay yours</span><span class="ar">ملفاتكم تبقى لكم</span></h3><p><span class="en">Enterprise terms that forbid training on your data, or a private deployment in your own cloud.</span><span class="ar">اتفاقيات مؤسسية تمنع التدريب على بياناتكم، أو تشغيل خاص على سحابتكم.</span></p></div>
+    <div class="q a" style="--i:5"><h3><span class="en">The legal position</span><span class="ar">الموقف القانوني</span></h3><p><span class="en">Egypt's copyright law gives rights in a collective work to whoever directed its creation (Law 82 of 2002, Article 175). It does not mention AI, so your counsel should confirm.</span><span class="ar">يمنح قانون حماية حقوق الملكية الفكرية المصري الحقوق في المصنَّف الجماعي لمن وجّه إلى ابتكاره (القانون 82 لسنة 2002، المادة 175). ولا يتناول القانون الذكاء الاصطناعي، لذا نوصي بتأكيد ذلك مع مستشاركم القانوني.</span></p></div>
+  </div>
+</section>
+
+<section class="slide s-close">
+  <p class="eyebrow a" style="--i:0"><span class="en">Next step</span><span class="ar">الخطوة التالية</span></p>
+  <h2 class="h1 a mt-auto" style="--i:1"><span class="en">Choose the three pilot titles.</span><span class="ar">اختيار الكتب الثلاثة للمشروع التجريبي.</span></h2>
+  <p class="lede a" style="--i:2"><span class="en">We start with your timesheets and files in week one. You see the first AI assisted books by week ten.</span><span class="ar">نبدأ ببيانات ساعات العمل والملفات في الأسبوع الأول، وترون أول الكتب المنجزة بمساعدة الذكاء الاصطناعي بحلول الأسبوع العاشر.</span></p>
+  <div class="title-foot a mt-auto" style="--i:3">
+    <span class="by"><span class="en">El Moasser</span><span class="ar">المعاصر</span></span>
+    <span><span class="en">Thank you</span><span class="ar">شكرًا لكم</span></span>
+  </div>
+</section>
+
+<section class="slide">
+  <p class="eyebrow a" style="--i:0"><span class="en">Sources</span><span class="ar">المصادر</span></p>
+  <h2 class="h2 a" style="--i:1"><span class="en">Every number in this deck traces to one of these.</span><span class="ar">كل رقم في هذا العرض يعود إلى أحد هذه المصادر.</span></h2>
+  <ul class="srcs a mt-auto" style="--i:2">
+    <li class="grp"><span class="en">Market</span><span class="ar">السوق</span></li>
+    <li><a href="https://m.akhbarelyom.com/news/NewDetails/4875982/1/التعليم-تطور-160-منهجًا-من-رياض-الأطفال-" target="_blank" rel="noopener"><span class="en">Akhbar El Yom</span><span class="ar">أخبار اليوم</span></a> <span><span class="en">160 curricula for 2026/27, 10 Sep 2026</span><span class="ar">160 منهجًا للعام الدراسي الجديد، 10 سبتمبر 2026</span></span></li>
+    <li><a href="https://www.elwatannews.com/news/details/8137861" target="_blank" rel="noopener"><span class="en">El Watan</span><span class="ar">الوطن</span></a> <span><span class="en">Ministry assessment books, 19 Sep 2025</span><span class="ar">كتب التقييمات، 19 سبتمبر 2025</span></span></li>
+    <li><a href="https://almalnews.com/2100106/%D8%AE%D9%84%D8%A7%D9%84-%C2%ABCEO-Level-Podcast%C2%BB-%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D8%B1-%D8%A7%D9%84%D8%A5%D9%82%D9%84%D9%8A%D9%85%D9%8A-%D8%A3%D8%AD%D9%85%D8%AF/" target="_blank" rel="noopener"><span class="en">Al Mal</span><span class="ar">جريدة المال</span></a> <span><span class="en">Interview with Misr Education, 22 Feb 2026</span><span class="ar">حوار مع منصة مصر للتعليم، 22 فبراير 2026</span></span></li>
+    <li><a href="https://almalnews.com/2113900/" target="_blank" rel="noopener"><span class="en">Al Mal</span><span class="ar">جريدة المال</span></a> <span><span class="en">Selah El Telmeez AI platform, 14 May 2026</span><span class="ar">منصة سلاح التلميذ بالذكاء الاصطناعي، 14 مايو 2026</span></span></li>
+    <li><a href="https://en.amwalalghad.com/egypt-eep-acquires-majority-stake-in-selah-el-telmeez/" target="_blank" rel="noopener"><span class="en">Amwal Al Ghad</span><span class="ar">أموال الغد</span></a> <span><span class="en">Ownership of Selah El Telmeez, Oct 2022</span><span class="ar">ملكية سلاح التلميذ، أكتوبر 2022</span></span></li>
+    <li><a href="https://parlmany.com/News/2/524530/جشع-التجار-وراء-أزمة-الكتب-الخارجية-أولياء-الأمور-نضطر-إلى" target="_blank" rel="noopener"><span class="en">Parlmany</span><span class="ar">برلماني</span></a> <span><span class="en">External book prices, Aug 2023</span><span class="ar">أسعار الكتب الخارجية، أغسطس 2023</span></span></li>
+    <li><a href="https://asianews.network/south-korea-pulls-plug-on-ai-textbooks/" target="_blank" rel="noopener">Asia News Network</a> <span><span class="en">South Korea AI textbooks, 5 Aug 2025</span><span class="ar">كتب الذكاء الاصطناعي في كوريا الجنوبية، 5 أغسطس 2025</span></span></li>
+    <li><a href="https://www.agip.com/Agip-Country-Service/en/30/C/3" target="_blank" rel="noopener">AGIP</a> <span><span class="en">Egypt copyright law, Law 82 of 2002</span><span class="ar">قانون الملكية الفكرية، القانون 82 لسنة 2002</span></span></li>
+    <li><a href="https://www.poundsterlinglive.com/history/USD-EGP-2026" target="_blank" rel="noopener">Pound Sterling Live</a> <span><span class="en">Dollar to pound rate, 16 Oct 2026</span><span class="ar">سعر الدولار مقابل الجنيه، 16 أكتوبر 2026</span></span></li>
+    <li class="grp"><span class="en">Research</span><span class="ar">الأبحاث</span></li>
+    <li><a href="https://arxiv.org/html/2312.03173v1" target="_blank" rel="noopener">Doughty et al., 2024</a> <span><span class="en">AI and human exam questions</span><span class="ar">أسئلة الامتحانات بين الذكاء الاصطناعي والبشر</span></span></li>
+    <li><a href="https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2024.1474019/pdf" target="_blank" rel="noopener">Runge et al., 2024</a> <span><span class="en">Duolingo AI test tasks</span><span class="ar">مهام اختبار مولّدة بالذكاء الاصطناعي</span></span></li>
+    <li><a href="https://arxiv.org/html/2510.06965" target="_blank" rel="noopener">Christ et al., 2025</a> <span><span class="en">EDUMATH word problems</span><span class="ar">مسائل رياضية لفظية</span></span></li>
+    <li><a href="https://repository.hku.hk/bitstream/10722/54324/1/134913.pdf" target="_blank" rel="noopener">Tarrant et al., 2006</a> <span><span class="en">Flaws in human written questions</span><span class="ar">عيوب الأسئلة المكتوبة بشريًا</span></span></li>
+    <li><a href="https://arxiv.org/html/2610.04267" target="_blank" rel="noopener">Moore and Diana, 2026</a> <span><span class="en">AI quality checks for exam items</span><span class="ar">فحص جودة الأسئلة آليًا</span></span></li>
+    <li><a href="https://peerj.com/articles/cs-3486/" target="_blank" rel="noopener">Mohi et al., 2026</a> <span><span class="en">Arabic grammar correction</span><span class="ar">تصحيح النحو العربي</span></span></li>
+    <li><a href="https://arxiv.org/html/2402.12840v2" target="_blank" rel="noopener">Koto et al., 2024</a> <span><span class="en">ArabicMMLU school exams</span><span class="ar">امتحانات مدرسية عربية</span></span></li>
+    <li><a href="https://artificialanalysis.ai/models/multilingual/arabic" target="_blank" rel="noopener">Artificial Analysis, 2026</a> <span><span class="en">Arabic reasoning index</span><span class="ar">مؤشر الاستدلال باللغة العربية</span></span></li>
+    <li class="grp"><span class="en">Productivity and cost</span><span class="ar">الإنتاجية والتكلفة</span></li>
+    <li><a href="https://mitsloan.mit.edu/sites/default/files/2023-10/SSRN-id4573321.pdf" target="_blank" rel="noopener">Dell'Acqua et al., 2023</a> <span><span class="en">BCG field experiment</span><span class="ar">تجربة ميدانية في BCG</span></span></li>
+    <li><a href="https://scale.stanford.edu/publications/experimental-evidence-productivity-effects-generative-artificial-intelligence" target="_blank" rel="noopener">Noy and Zhang, 2023</a> <span><span class="en">Science, writing productivity</span><span class="ar">إنتاجية الكتابة، مجلة Science</span></span></li>
+    <li><a href="https://s205.q4cdn.com/964897494/files/doc_financials/2026/q4/MH-2026-6-11-AI-Blueprint_FINAL.pdf" target="_blank" rel="noopener">McGraw Hill, 2026</a> <span><span class="en">AI Blueprint, content savings</span><span class="ar">خطة الذكاء الاصطناعي ووفورات المحتوى</span></span></li>
+    <li><a href="https://anotherwrapper.com/llm-pricing/claude-opus-5-5" target="_blank" rel="noopener">Claude API pricing</a> <span><span class="en">Running cost estimate</span><span class="ar">تقدير تكلفة التشغيل</span></span></li>
+  </ul>
+</section>
+</main>
+
+<nav class="nav" aria-label="Slides">
+  <button class="btn" id="prevBtn" type="button" aria-label="Previous slide"><span class="ico" aria-hidden="true">←</span></button>
+  <button class="btn" id="nextBtn" type="button" aria-label="Next slide"><span class="ico" aria-hidden="true">→</span></button>
+</nav>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+var root=document.documentElement;
+var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var N=slides.length;
+var counter=document.getElementById('counter');
+var bar=document.getElementById('progressBar');
+var langBtn=document.getElementById('langBtn');
+var prevBtn=document.getElementById('prevBtn');
+var nextBtn=document.getElementById('nextBtn');
+var fsBtn=document.getElementById('fsBtn');
+var stackMQ=window.matchMedia('(max-width:760px),(max-aspect-ratio:1/1),(max-height:540px)');
+var reduceMQ=window.matchMedia('(prefers-reduced-motion: reduce)');
+var cur=0, scene=null;
+
+function isAr(){return root.lang==='ar';}
+function pad(n){return (n<10?'0':'')+n;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setCounter(i){counter.textContent=pad(i+1)+' / '+pad(N);bar.style.transform='scaleX('+((i+1)/N)+')';}
+
+/* ---------- figures ---------- */
+var SCN=[{k:'today',lo:0.6,hi:2.4,sh:'0%'},{k:'assist',lo:1.2,hi:1.9,sh:'~30%'},{k:'coauthor',lo:1.2,hi:1.9,sh:'~50%'},{k:'sample',lo:16.9,hi:27.1,sh:'~75%'},{k:'auto',lo:27.6,hi:44.2,sh:'~90%'}];
+var SCT={
+  en:{today:'Today, human only',assist:'Assist',coauthor:'Coauthor',sample:'Sample review',auto:'Autopilot',rec:'Recommended',band:"Today's level",y:'Wrong questions left in each book after review',x:'Share of editorial hours done by AI',to:'to',title:'Errors jump when human review is cut, not when AI drafts more'},
+  ar:{today:'اليوم، بشري بالكامل',assist:'مساعدة',coauthor:'شراكة في التأليف',sample:'مراجعة بالعينة',auto:'تشغيل آلي',rec:'الموصى به',band:'المستوى الحالي',y:'الأسئلة الخاطئة المتبقية في الكتاب بعد المراجعة',x:'نسبة ساعات العمل التحريري المنجزة بالذكاء الاصطناعي',to:'إلى',title:'تقفز الأخطاء عند تقليص المراجعة البشرية'}
+};
+function scenarioSVG(){
+  var ar=isAr(),T=ar?SCT.ar:SCT.en;
+  var W=900,H=404,L=30,R=880,y0=64,base=300,max=48,band=(R-L)/5;
+  function cx(i){return L+band*(i+0.5);}
+  function Y(v){return +(base-v/max*(base-y0)).toFixed(1);}
+  var s='<svg class="chart" direction="ltr" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(T.title)+'">';
+  s+='<text x="'+(ar?R:L)+'" y="24" text-anchor="'+(ar?'end':'start')+'" class="c-cap">'+esc(T.y)+'</text>';
+  s+='<rect x="'+L+'" y="'+Y(2.4)+'" width="'+(R-L)+'" height="'+(Y(0.6)-Y(2.4)).toFixed(1)+'" class="c-band"/>';
+  s+='<text x="'+R+'" y="'+(Y(2.4)-10)+'" text-anchor="end" class="c-cap">'+esc(T.band)+'</text>';
+  s+='<line x1="'+L+'" x2="'+R+'" y1="'+base+'" y2="'+base+'" class="c-axis"/>';
+  SCN.forEach(function(r,i){
+    var hot=r.k==='coauthor',m=(r.lo+r.hi)/2,small=r.hi<10,x=cx(i),sc=hot?'s-hot':'s-mute',fc=hot?'f-hot':'f-mute';
+    s+='<g>';
+    s+='<line x1="'+x+'" x2="'+x+'" y1="'+Y(r.hi)+'" y2="'+Y(r.lo)+'" class="'+sc+'"/>';
+    s+='<line x1="'+(x-8)+'" x2="'+(x+8)+'" y1="'+Y(r.hi)+'" y2="'+Y(r.hi)+'" class="'+sc+'"/>';
+    s+='<line x1="'+(x-8)+'" x2="'+(x+8)+'" y1="'+Y(r.lo)+'" y2="'+Y(r.lo)+'" class="'+sc+'"/>';
+    s+='<circle cx="'+x+'" cy="'+Y(m)+'" r="6" class="'+fc+'"><title>'+esc(T[r.k]+': '+r.lo+' '+T.to+' '+r.hi)+'</title></circle>';
+    s+='<text x="'+(small?x:x+16)+'" y="'+(small?Y(r.hi)-14:Y(m)+5)+'" text-anchor="'+(small?'middle':'start')+'" class="c-v">'+r.lo+'–'+r.hi+'</text>';
+    s+='<text x="'+x+'" y="'+(base+30)+'" text-anchor="middle" class="c-n'+(hot?' is-hot':'')+'">'+esc(T[r.k])+'</text>';
+    s+='<text x="'+x+'" y="'+(base+52)+'" text-anchor="middle" class="c-s">'+r.sh+'</text>';
+    s+='</g>';
+  });
+  s+='<text x="'+cx(2)+'" y="'+(Y(1.9)-40)+'" text-anchor="middle" class="c-rec">'+esc(T.rec)+'</text>';
+  s+='<text x="'+((L+R)/2)+'" y="'+(H-10)+'" text-anchor="middle" class="c-cap">'+esc(T.x)+'</text>';
+  return s+'</svg>';
+}
+var ENG={
+  en:{ai:'AI',people:'Your team',feedback:'Every reviewer edit trains the engine',approved:'approved items',title:'AI drafts and checks. Your people decide.',
+    content:['Content base','Ministry books,','your back catalog'],blueprint:['Blueprint','Question types,','levels, counts'],approve:['Lead approves','Sets the mix','before drafting'],
+    draft:['Drafting engine','Explanations,','questions, keys'],verify:['Verification','Solves every','question again'],subject:['Subject review','Every item, next','to its source'],
+    language:['Language review','AI flags,','linguists decide'],typeset:['Typesetting','and Ministry','licensing'],bank:['Question bank','Stage two: apps and Gulf editions']},
+  ar:{ai:'الذكاء الاصطناعي',people:'فريقكم',feedback:'كل تعديل من المراجعين يدرّب المحرّك',approved:'الأسئلة المعتمدة',title:'الذكاء الاصطناعي يكتب ويتحقق، وفريقكم يقرر',
+    content:['قاعدة المحتوى','كتب الوزارة','وأرشيف المعاصر'],blueprint:['خطة الكتاب','أنواع الأسئلة','ومستوياتها وعددها'],approve:['اعتماد رئيس القسم','يحدد التوزيع','قبل الكتابة'],
+    draft:['محرّك الصياغة','الشرح والأسئلة','ونماذج الإجابة'],verify:['طبقة التحقق','يعيد حل','كل سؤال'],subject:['المراجعة العلمية','كل سؤال','بجوار مصدره'],
+    language:['التدقيق اللغوي','تنبيه آلي','وقرار لغوي'],typeset:['الإخراج والترخيص','تصدير للتنسيق','وترخيص الوزارة'],bank:['بنك الأسئلة','المرحلة الثانية: تطبيقات وطبعات خليجية']}
+};
+function engineSVG(){
+  var ar=isAr(),T=ar?ENG.ar:ENG.en,W=1200,H=470,x0=20,colW=145,w=128,h=84;
+  function X(x){return ar?W-x:x;}
+  function nx(c){return x0+c*colW+8.5;}
+  function cxc(c){return nx(c)+w/2;}
+  function gm(c){return nx(c)+w+(colW-w)/2;}
+  var yAI=74,yP=264,cyAI=116,cyP=306;
+  function rect(x,y,ww,hh,cls){return '<rect x="'+(ar?W-x-ww:x)+'" y="'+y+'" width="'+ww+'" height="'+hh+'" rx="8" class="'+cls+'"/>';}
+  function txt(x,y,str,cls,anchor){var a=anchor||'middle';if(a!=='middle'&&ar)a=(a==='start')?'end':'start';return '<text x="'+X(x)+'" y="'+y+'" text-anchor="'+a+'" class="'+cls+'">'+esc(str)+'</text>';}
+  function path(pts,cls,mk){var d='';for(var i=0;i<pts.length;i++){d+=(i?'L':'M')+X(pts[i][0])+' '+pts[i][1];}return '<path d="'+d+'" class="'+cls+'" marker-end="url(#'+mk+')"/>';}
+  var seq=[['content',0,'ai'],['blueprint',1,'ai'],['approve',2,'p'],['draft',3,'ai'],['verify',4,'ai'],['subject',5,'p'],['language',6,'p'],['typeset',7,'p']];
+  var s='<svg class="eng" direction="ltr" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(T.title)+'">';
+  s+='<defs><marker id="engArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#9F9E98"/></marker>';
+  s+='<marker id="engArrHot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FF4200"/></marker></defs>';
+  s+=rect(10,40,1180,150,'e-lane')+rect(10,230,1180,150,'e-lane');
+  s+=txt(x0+6,62,T.ai,'e-lab','start')+txt(x0+6,252,T.people,'e-lab','start');
+  for(var i=0;i<seq.length-1;i++){
+    var a=seq[i],b=seq[i+1],ya=a[2]==='ai'?cyAI:cyP,yb=b[2]==='ai'?cyAI:cyP;
+    if(ya===yb){s+=path([[nx(a[1])+w,ya],[nx(b[1]),yb]],'e-ar','engArr');}
+    else{s+=path([[nx(a[1])+w,ya],[gm(a[1]),ya],[gm(a[1]),yb],[nx(b[1]),yb]],'e-ar','engArr');}
+  }
+  s+=path([[cxc(5),yP],[cxc(5),cyAI],[nx(6),cyAI]],'e-ar','engArr');
+  s+=txt(cxc(5)+10,206,T.approved,'e-q','start');
+  s+=path([[cxc(5),yP+h],[cxc(5),420],[cxc(3),420],[cxc(3),yAI+h]],'e-fb','engArrHot');
+  s+=txt((cxc(3)+cxc(5))/2,446,T.feedback,'e-q');
+  seq.forEach(function(n){
+    var y=n[2]==='ai'?yAI:yP,c=n[1],L=T[n[0]];
+    s+='<g>'+rect(nx(c),y,w,h,n[2]==='ai'?'e-ai':'e-p');
+    s+=txt(cxc(c),y+30,L[0],'e-nm')+txt(cxc(c),y+52,L[1],'e-bd')+txt(cxc(c),y+70,L[2],'e-bd')+'</g>';
+  });
+  var bw=colW+w;
+  s+='<g>'+rect(nx(6),yAI,bw,h,'e-bank')+txt(nx(6)+bw/2,yAI+34,T.bank[0],'e-nm')+txt(nx(6)+bw/2,yAI+58,T.bank[1],'e-bd')+'</g>';
+  return s+'</svg>';
+}
+function scenarioHTML(){
+  var ar=isAr(),T=ar?SCT.ar:SCT.en,max=48;
+  function pc(v){return (v/max*100).toFixed(2)+'%';}
+  var s='<div class="mchart" role="img" aria-label="'+esc(T.title)+'"><p class="mc-cap">'+esc(T.y)+'</p>';
+  SCN.forEach(function(r){
+    var hot=r.k==='coauthor';
+    s+='<div class="mrow'+(hot?' hot':'')+'"><div class="mtop"><span class="mn">'+esc(T[r.k])+'<small><bdi dir="ltr">'+r.sh+'</bdi></small>'+(hot?'<em>'+esc(T.rec)+'</em>':'')+'</span><b><bdi dir="ltr">'+r.lo+'\u2013'+r.hi+'</bdi></b></div>';
+    s+='<div class="mtrack"><i class="mband" style="inset-inline-start:'+pc(0.6)+';width:'+pc(1.8)+'"></i><i class="mrange" style="inset-inline-start:'+pc(r.lo)+';width:max(8px,'+pc(r.hi-r.lo)+')"></i></div></div>';
+  });
+  s+='<p class="mc-cap">'+esc(ar?'النسب الصغيرة: حصة الذكاء الاصطناعي من ساعات العمل التحريري. الشريط الفاتح في بداية كل خط: المستوى الحالي.':'Small percentages: share of editorial hours done by AI. The light strip at the start of each line: today\'s level.')+'</p></div>';
+  return s;
+}
+function engineHTML(){
+  var ar=isAr(),T=ar?ENG.ar:ENG.en;
+  var over=ar?{typeset:['الإخراج والترخيص','تصدير للتنسيق وترخيص الوزارة كما هو اليوم']}:{typeset:['Typesetting and licensing','InDesign export, Ministry licensing as today']};
+  var seq=[['content','ai'],['blueprint','ai'],['approve','p'],['draft','ai'],['verify','ai'],['subject','p'],['language','p'],['typeset','p']];
+  var s='<ol class="mflow" aria-label="'+esc(T.title)+'">';
+  seq.forEach(function(n,i){
+    var L=over[n[0]]||[T[n[0]][0],T[n[0]][1]+' '+T[n[0]][2]];
+    s+='<li class="'+(n[1]==='ai'?'ai':'tm')+(i<seq.length-1?' flow':'')+'"><span class="mtag">'+esc(n[1]==='ai'?T.ai:T.people)+'</span><b>'+esc(L[0])+'</b><span>'+esc(L[1])+'</span>';
+    if(n[0]==='subject')s+='<span class="mloop">'+esc(T.feedback)+'</span>';
+    s+='</li>';
+  });
+  s+='<li class="bank"><span class="mtag">'+esc(ar?'المرحلة الثانية':'Stage two')+'</span><b>'+esc(T.bank[0])+'</b><span>'+esc(ar?'كل سؤال معتمد يغذي التطبيقات والطبعات الخليجية':'Every approved item feeds apps and Gulf editions')+'</span></li></ol>';
+  return s;
+}
+function renderFigures(){
+  var c=stackMQ.matches;
+  var a=document.getElementById('scenarioChart');if(a)a.innerHTML=c?scenarioHTML():scenarioSVG();
+  var b=document.getElementById('engineDiagram');if(b)b.innerHTML=c?engineHTML():engineSVG();
+}
+
+/* ---------- particle scene ---------- */
+function makeScene(){
+  if(typeof THREE==='undefined')return null;
+  var canvas=document.getElementById('bgCanvas'),renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});}catch(e){canvas.style.display='none';return null;}
+  var PR=Math.min(window.devicePixelRatio||1,2);
+  renderer.setPixelRatio(PR);renderer.setClearColor(0x000000,0);
+  var scene3=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(40,1,0.1,100);camera.position.set(0,0,14);
+  var COUNT=4200,seed=20261016;
+  function rnd(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}
+  var sA=new Float32Array(COUNT),sB=new Float32Array(COUNT),sC=new Float32Array(COUNT);
+  var pos=new Float32Array(COUNT*3),col=new Float32Array(COUNT*3),size=new Float32Array(COUNT);
+  var i;
+  for(i=0;i<COUNT;i++){sA[i]=rnd();sB[i]=rnd();sC[i]=rnd();pos[i*3]=(sA[i]-0.5)*20;pos[i*3+1]=(sB[i]-0.5)*11;pos[i*3+2]=-7+sC[i]*8;col[i*3]=col[i*3+1]=col[i*3+2]=0.3;size[i]=0.55+rnd()*0.95;}
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  geo.setAttribute('aColor',new THREE.BufferAttribute(col,3));
+  geo.setAttribute('aSize',new THREE.BufferAttribute(size,1));
+  var mat=new THREE.ShaderMaterial({
+    uniforms:{uSize:{value:42},uPR:{value:PR},uOpacity:{value:0}},
+    vertexShader:'attribute vec3 aColor;attribute float aSize;uniform float uSize;uniform float uPR;varying vec3 vColor;varying float vFade;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_Position=projectionMatrix*mv;float d=-mv.z;gl_PointSize=aSize*uSize*uPR/d;vColor=aColor;vFade=clamp((d-9.0)/12.0,0.0,1.0);}',
+    fragmentShader:'uniform float uOpacity;varying vec3 vColor;varying float vFade;void main(){vec2 c=gl_PointCoord-vec2(0.5);float r=length(c);if(r>0.5)discard;float a=smoothstep(0.5,0.12,r);gl_FragColor=vec4(vColor,a*uOpacity*(1.0-0.55*vFade));}',
+    transparent:true,depthWrite:false
+  });
+  var pts=new THREE.Points(geo,mat);pts.frustumCulled=false;
+  var group=new THREE.Group();group.add(pts);scene3.add(group);
+
+  var PAPER=[0.98,0.98,0.97],ACC=[1,0.259,0],MUTE=[0.55,0.55,0.52],DIM=[0.34,0.34,0.32];
+  function setC(C,k,c){C[k*3]=c[0];C[k*3+1]=c[1];C[k*3+2]=c[2];}
+  function staticF(build){var P=new Float32Array(COUNT*3),C=new Float32Array(COUNT*3);build(P,C);return {dynamic:false,P:P,C:C};}
+  var F={};
+  F.book=staticF(function(P,C){
+    var tilt=0.95,ct=Math.cos(tilt),st=Math.sin(tilt);
+    for(var k=0;k<COUNT;k++){
+      var layer=k%8,side=((k>>3)%2)?1:-1,u=Math.pow(rnd(),0.8),v,top=layer===7;
+      if(top&&rnd()<0.82){var row=Math.floor(rnd()*15);v=-0.8+row*0.114+(rnd()-0.5)*0.012;u=0.1+u*0.8;if(Math.sin(u*46+row*2.3)>0.82)u+=0.02;}
+      else v=rnd()*2-1;
+      var x=side*(0.06+u*3.0);
+      var z=Math.sin(Math.min(u,1)*Math.PI*0.92)*0.55*(0.6+layer*0.06)+layer*0.025-(7-layer)*0.03*u;
+      var y=v*2.05;
+      P[k*3]=x;P[k*3+1]=(y*ct-z*st)*0.95;P[k*3+2]=y*st+z*ct;
+      setC(C,k,rnd()<0.035?ACC:(top?PAPER:(layer>4?MUTE:DIM)));
+    }
+  });
+  F.grid=staticF(function(P,C){
+    var hi={},n=0;while(n<160){var q=Math.floor(rnd()*800);if(!hi[q]){hi[q]=1;n++;}}
+    var b=-0.32,cb=Math.cos(b),sb=Math.sin(b);
+    for(var k=0;k<COUNT;k++){
+      if(k<4000){var t=Math.floor(k/5),j=k%5,c=t%40,r=Math.floor(t/40);var x=(c-19.5)*0.28,y=(r-9.5)*0.38+(j-2)*0.06,z=(rnd()-0.5)*0.03;P[k*3]=x*cb+z*sb;P[k*3+1]=y;P[k*3+2]=-x*sb+z*cb;setC(C,k,hi[t]?ACC:MUTE);}
+      else{P[k*3]=(rnd()-0.5)*16;P[k*3+1]=(rnd()-0.5)*9;P[k*3+2]=-4-rnd()*4;setC(C,k,DIM);}
+    }
+  });
+  F.sphere=staticF(function(P,C){
+    var R=2.7,ga=Math.PI*(3-Math.sqrt(5));
+    for(var k=0;k<COUNT;k++){var y=1-(k/(COUNT-1))*2,r=Math.sqrt(1-y*y),th=ga*k,x=Math.cos(th)*r,z=Math.sin(th)*r;P[k*3]=x*R;P[k*3+1]=y*R;P[k*3+2]=z*R;setC(C,k,Math.abs(Math.atan2(z,x))<0.14?ACC:(Math.abs(y)>0.85?DIM:MUTE));}
+  });
+  function buildSplit(warn){return staticF(function(P,C){
+    var nA=Math.round(COUNT*0.817),ga=Math.PI*(3-Math.sqrt(5));
+    for(var k=0;k<COUNT;k++){var inA=k<nA,n=inA?nA:COUNT-nA,j=inA?k:k-nA,y=1-(j/(n-1))*2,r=Math.sqrt(Math.max(0,1-y*y)),th=ga*j,R=inA?2.2:1.0,jt=1+(rnd()-0.5)*0.06,cx=inA?-1.1:2.6,cy=inA?0:0.9;
+      P[k*3]=cx+Math.cos(th)*r*R*jt;P[k*3+1]=cy+y*R*jt;P[k*3+2]=Math.sin(th)*r*R*jt;setC(C,k,inA?(warn?DIM:PAPER):ACC);}
+  });}
+  F.split=buildSplit(false);F.warn=buildSplit(true);
+  F.bars=staticF(function(P,C){
+    var vals=[25,40,60],xs=[-2.6,0,2.6],tot=125,k=0;
+    for(var bi=0;bi<3;bi++){var n=bi<2?Math.round(COUNT*vals[bi]/tot):COUNT-k,h=vals[bi]/60*4.4;
+      for(var j=0;j<n;j++,k++){var f=rnd(),x=(rnd()-0.5)*1.1,z=(rnd()-0.5)*1.1,y=-2.4+rnd()*h;
+        if(f<0.25)x=-0.55;else if(f<0.5)x=0.55;else if(f<0.72)z=0.55;else if(f<0.84)y=-2.4+h;else z=-0.55;
+        P[k*3]=xs[bi]+x;P[k*3+1]=y;P[k*3+2]=z;setC(C,k,(y>-2.4+h-0.2)?ACC:(bi===2?PAPER:MUTE));}}
+  });
+  F.coins=staticF(function(P,C){
+    var counts=[6,12,24],xs=[-2.6,0,2.6],totalD=42,k=0;
+    for(var s=0;s<3;s++){var n=s<2?Math.round(COUNT*counts[s]/totalD):COUNT-k;
+      for(var j=0;j<n;j++,k++){var d=Math.floor(rnd()*counts[s]),a=rnd()*Math.PI*2,rim=rnd()<0.7,rr=rim?0.75:Math.sqrt(rnd())*0.75;
+        P[k*3]=xs[s]+Math.cos(a)*rr;P[k*3+1]=-2.6+d*0.17+(rim?(rnd()-0.5)*0.08:0.04);P[k*3+2]=Math.sin(a)*rr*0.5;setC(C,k,d===counts[s]-1?ACC:(rim?PAPER:MUTE));}}
+  });
+  F.weeks=staticF(function(P,C){
+    for(var k=0;k<COUNT;k++){
+      if(k<COUNT*0.86){var w=k%12,a=rnd()*Math.PI*2,b=Math.acos(2*rnd()-1),R=0.3*Math.cbrt(rnd()),x=-5.5+w;
+        P[k*3]=x+R*Math.sin(b)*Math.cos(a);P[k*3+1]=R*Math.cos(b)+Math.sin(w*0.6)*0.15;P[k*3+2]=R*Math.sin(b)*Math.sin(a);setC(C,k,(w>=6&&w<=9)?ACC:PAPER);}
+      else{var s=rnd();P[k*3]=-5.5+s*11;P[k*3+1]=Math.sin(s*11*0.6)*0.15+(rnd()-0.5)*0.02;P[k*3+2]=0;setC(C,k,DIM);}
+    }
+  });
+  F.lattice=staticF(function(P,C){
+    var n=16,s=0.26,o=(n-1)/2;
+    for(var k=0;k<COUNT;k++){
+      if(k<4096){P[k*3]=(k%n-o)*s;P[k*3+1]=(Math.floor(k/n)%n-o)*s;P[k*3+2]=(Math.floor(k/(n*n))-o)*s;setC(C,k,rnd()<0.1?ACC:(rnd()<0.5?MUTE:DIM));}
+      else{P[k*3]=(rnd()-0.5)*4;P[k*3+1]=(rnd()-0.5)*4;P[k*3+2]=(rnd()-0.5)*4;setC(C,k,DIM);}
+    }
+  });
+  F.dust={dynamic:true,fill:function(t,P,C){for(var k=0;k<COUNT;k++){P[k*3]=(sA[k]-0.5)*20;P[k*3+1]=(sB[k]-0.5)*11+Math.sin(t*0.15+sC[k]*6.28)*0.25;P[k*3+2]=-7+sC[k]*8;setC(C,k,sC[k]>0.985?ACC:DIM);}}};
+  F.stream={dynamic:true,wrap:true,fill:function(t,P,C){for(var k=0;k<COUNT;k++){var s=(sA[k]+t*0.022)%1,x=-7+s*14,env=Math.sin(s*Math.PI);P[k*3]=x;P[k*3+1]=(sB[k]-0.5)*1.4*env+Math.sin(x*0.7+sC[k]*6.28+t*0.5)*0.12;P[k*3+2]=(sC[k]-0.5)*1.2*env;setC(C,k,(s>0.05&&s<0.65)?ACC:MUTE);}}};
+  F.lanes={dynamic:true,wrap:true,fill:function(t,P,C){for(var k=0;k<COUNT;k++){var s=(sA[k]+t*0.02)%1,x=-7.5+s*15,ai=k%2===0,by=ai?1.1:-1.1;if(x>2.5)by*=Math.max(0,1-(x-2.5)/2.5);P[k*3]=x;P[k*3+1]=by+(sB[k]-0.5)*0.45;P[k*3+2]=(sC[k]-0.5)*0.7;setC(C,k,ai?ACC:PAPER);}}};
+  F.ring={dynamic:true,fill:function(t,P,C){var R=2.4,r=0.32,tl=1.05,ct=Math.cos(tl),st=Math.sin(tl);for(var k=0;k<COUNT;k++){var th=sA[k]*Math.PI*2+t*0.22,ph=sB[k]*Math.PI*2,x=(R+r*Math.cos(ph))*Math.cos(th),y=(R+r*Math.cos(ph))*Math.sin(th),z=r*Math.sin(ph);P[k*3]=x;P[k*3+1]=y*ct-z*st;P[k*3+2]=y*st+z*ct;setC(C,k,sA[k]<0.2?ACC:(sC[k]<0.5?PAPER:MUTE));}}};
+
+  var CFG=[
+    {f:'book',op:1,x:3.7,y:-0.3,z:0},
+    {f:'grid',op:0.42,x:0,y:0.9,z:-3},
+    {f:'sphere',op:0.55,x:4.8,y:0,z:-1,spin:0.12},
+    {f:'stream',op:0.5,x:0,y:-3.5,z:-1},
+    {f:'split',op:0.38,x:4.8,y:1.6,z:-3},
+    {f:'warn',op:0.42,x:4.8,y:1.6,z:-3},
+    {f:'bars',op:0.32,x:5.2,y:0.6,z:-3},
+    {f:'dust',op:0.5,x:0,y:0,z:0},
+    {f:'dust',op:0.35,x:0,y:0,z:0},
+    {f:'lanes',op:0.16,x:0,y:-0.4,z:-5},
+    {f:'sphere',op:0.3,x:5.6,y:0,z:-2,spin:0.1},
+    {f:'ring',op:0.42,x:4.8,y:1.2,z:-3},
+    {f:'dust',op:0.35,x:0,y:0,z:0},
+    {f:'dust',op:0.32,x:0,y:0,z:0},
+    {f:'dust',op:0.3,x:0,y:0,z:0},
+    {f:'lattice',op:0.42,x:4.8,y:0.6,z:-1,spin:0.15},
+    {f:'book',op:1,x:3.7,y:-0.3,z:0},
+    {f:'dust',op:0.22,x:0,y:0,z:0}
+  ];
+  var tP=new Float32Array(COUNT*3),tC=new Float32Array(COUNT*3);
+  var form=null,cfg=CFG[0],dir=1,t=0,last=performance.now(),rotY=0,mx=0,my=0;
+  function useForm(name){form=F[name]||F.dust;if(!form.dynamic){tP.set(form.P);tC.set(form.C);}else form.fill(t,tP,tC);}
+  function wrapAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;}
+  function resize(){var w=window.innerWidth,h=window.innerHeight,asp=w/h;renderer.setSize(w,h,false);camera.aspect=asp;camera.position.z=asp<1.2?14*(1.2/asp):14;camera.updateProjectionMatrix();mat.uniforms.uSize.value=42*Math.max(0.75,Math.min(1.6,h/900));}
+  window.addEventListener('resize',resize);resize();
+  window.addEventListener('pointermove',function(e){mx=(e.clientX/window.innerWidth-0.5)*2;my=(e.clientY/window.innerHeight-0.5)*2;},{passive:true});
+  function frame(now){
+    var dt=Math.min(0.05,Math.max(0,(now-last)/1000));last=now;
+    var reduce=reduceMQ.matches,stack=stackMQ.matches;
+    if(!reduce)t+=dt;
+    if(form.dynamic)form.fill(t,tP,tC);
+    var k=reduce?1:1-Math.exp(-dt*2.4),kc=reduce?1:1-Math.exp(-dt*3.2),kg=reduce?1:1-Math.exp(-dt*2.2);
+    for(var p=0;p<COUNT;p++){var b=p*3,dx=tP[b]-pos[b];
+      if(form.wrap&&Math.abs(dx)>6){pos[b]=tP[b];pos[b+1]=tP[b+1];pos[b+2]=tP[b+2];}
+      else{pos[b]+=dx*k;pos[b+1]+=(tP[b+1]-pos[b+1])*k;pos[b+2]+=(tP[b+2]-pos[b+2])*k;}
+      col[b]+=(tC[b]-col[b])*kc;col[b+1]+=(tC[b+1]-col[b+1])*kc;col[b+2]+=(tC[b+2]-col[b+2])*kc;}
+    geo.attributes.position.needsUpdate=true;geo.attributes.aColor.needsUpdate=true;
+    var gx=(stack?0:cfg.x)*dir,gy=stack?0:cfg.y,gz=cfg.z-(stack?2.5:0),op=cfg.op*(stack?0.4:1);
+    group.position.x+=(gx-group.position.x)*kg;group.position.y+=(gy-group.position.y)*kg;group.position.z+=(gz-group.position.z)*kg;
+    mat.uniforms.uOpacity.value+=(op-mat.uniforms.uOpacity.value)*kg;
+    if(cfg.spin&&!reduce){rotY+=cfg.spin*dt;}
+    else{rotY=wrapAngle(rotY);var target=reduce?0:Math.sin(t*0.12)*0.22+mx*0.12;rotY+=(target-rotY)*kg;}
+    group.rotation.y=rotY;group.rotation.x+=((reduce?0:my*0.07)-group.rotation.x)*kg;
+    renderer.render(scene3,camera);
+    window.requestAnimationFrame(frame);
+  }
+  useForm(cfg.f);
+  window.requestAnimationFrame(frame);
+  return {
+    setSlide:function(n){var c=CFG[n]||CFG[CFG.length-1];if(c===cfg)return;if(!c.spin)rotY=wrapAngle(rotY);cfg=c;useForm(c.f);},
+    setDir:function(rtl){dir=rtl?-1:1;}
+  };
+}
+
+/* ---------- navigation ---------- */
+function labelSlides(){slides.forEach(function(s,k){s.setAttribute('aria-roledescription',isAr()?'شريحة':'slide');s.setAttribute('aria-label',(k+1)+' / '+N);});}
+function show(i){
+  i=Math.max(0,Math.min(N-1,i));cur=i;
+  if(!stackMQ.matches){
+    slides.forEach(function(s,k){var on=k===i;s.classList.toggle('is-active',on);s.inert=!on;if(on)s.removeAttribute('aria-hidden');else s.setAttribute('aria-hidden','true');});
+  }
+  setCounter(i);
+  if(scene)scene.setSlide(i);
+  try{history.replaceState(null,'','#s'+(i+1));}catch(e){}
+}
+function applyMode(){
+  if(stackMQ.matches){slides.forEach(function(s){s.inert=false;s.removeAttribute('aria-hidden');s.classList.add('is-active');});}
+  else show(cur);
+  renderFigures();
+}
+function setLang(l){
+  root.lang=l;root.dir=(l==='ar')?'rtl':'ltr';
+  try{localStorage.setItem('moasser-deck-lang',l);}catch(e){}
+  langBtn.setAttribute('aria-label',l==='ar'?'التبديل إلى الإنجليزية':'Switch to Arabic');
+  prevBtn.setAttribute('aria-label',l==='ar'?'الشريحة السابقة':'Previous slide');
+  nextBtn.setAttribute('aria-label',l==='ar'?'الشريحة التالية':'Next slide');
+  labelSlides();renderFigures();
+  if(scene)scene.setDir(l==='ar');
+}
+function toggleLang(){setLang(isAr()?'en':'ar');}
+
+langBtn.addEventListener('click',toggleLang);
+prevBtn.addEventListener('click',function(){show(cur-1);});
+nextBtn.addEventListener('click',function(){show(cur+1);});
+fsBtn.addEventListener('click',function(){
+  try{
+    if(document.fullscreenElement){var x=document.exitFullscreen&&document.exitFullscreen();if(x&&x.catch)x.catch(function(){});}
+    else{var p=root.requestFullscreen&&root.requestFullscreen();if(p&&p.catch)p.catch(function(){});}
+  }catch(e){}
+});
+window.addEventListener('keydown',function(e){
+  if(e.altKey||e.ctrlKey||e.metaKey)return;
+  var k=e.key,tag=(e.target&&e.target.tagName)||'';
+  if(k==='l'||k==='L'){toggleLang();return;}
+  if(stackMQ.matches)return;
+  if((k===' '||k==='Enter')&&(tag==='BUTTON'||tag==='A'))return;
+  if(k==='ArrowRight'||k==='ArrowDown'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();show(cur+1);}
+  else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){e.preventDefault();show(cur-1);}
+  else if(k==='Home'){e.preventDefault();show(0);}
+  else if(k==='End'){e.preventDefault();show(N-1);}
+});
+var wheelLock=0;
+window.addEventListener('wheel',function(e){
+  if(stackMQ.matches)return;
+  var now=Date.now(),d=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+  if(now<wheelLock||Math.abs(d)<25)return;
+  wheelLock=now+800;show(cur+(d>0?1:-1));
+},{passive:true});
+var tx=null,ty=null;
+window.addEventListener('touchstart',function(e){var t=e.touches[0];tx=t.clientX;ty=t.clientY;},{passive:true});
+window.addEventListener('touchend',function(e){
+  if(stackMQ.matches||tx===null)return;
+  var t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;tx=null;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){var fwd=isAr()?dx>0:dx<0;show(cur+(fwd?1:-1));}
+},{passive:true});
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(entries){
+    if(!stackMQ.matches)return;
+    entries.forEach(function(en){if(en.isIntersecting){var k=slides.indexOf(en.target);if(k>=0&&k!==cur){cur=k;setCounter(k);if(scene)scene.setSlide(k);}}});
+  },{rootMargin:'-45% 0px -45% 0px'});
+  slides.forEach(function(s){io.observe(s);});
+}
+if(stackMQ.addEventListener)stackMQ.addEventListener('change',applyMode);else if(stackMQ.addListener)stackMQ.addListener(applyMode);
+
+/* ---------- boot ---------- */
+try{scene=makeScene();}catch(e){scene=null;}
+setLang(isAr()?'ar':'en');
+var m=/^#s(\d{1,2})$/.exec(location.hash||'');
+var start=m?Math.max(0,Math.min(N-1,parseInt(m[1],10)-1)):0;
+cur=start;
+applyMode();
+show(start);
+if(stackMQ.matches&&start>0){try{slides[start].scrollIntoView();}catch(e){}}
+})();
+</script>
+</body>
+</html>
